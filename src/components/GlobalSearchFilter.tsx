@@ -76,8 +76,8 @@ export const GlobalSearchFilter: React.FC<GlobalSearchFilterProps> = ({
                 onClick={() => setSelectedSource(source)}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                   isSelected
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-purple-700'
+                    ? 'bg-[#8B5CF6] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-[#8B5CF6]'
                 }`}
               >
                 {source === 'ALL' ? 'All Channels' : source}
@@ -93,11 +93,11 @@ export const GlobalSearchFilter: React.FC<GlobalSearchFilterProps> = ({
           onClick={() => setMaxExpFilter(maxExpFilter === 1 ? 2 : 1)}
           className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5 ${
             maxExpFilter <= 1
-              ? 'bg-purple-50 text-purple-700 border-purple-200 font-bold'
-              : 'bg-white border-slate-200 text-slate-600 hover:border-purple-300'
+              ? 'bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/30 font-bold'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-[#8B5CF6]/40'
           }`}
         >
-          <Clock className="w-3.5 h-3.5 text-purple-600" />
+          <Clock className="w-3.5 h-3.5 text-[#8B5CF6]" />
           <span>Verified Entry-Level ({maxExpFilter <= 1 ? '≤1 yr' : '≤2 yrs'})</span>
         </button>
 
@@ -117,18 +117,18 @@ export const GlobalSearchFilter: React.FC<GlobalSearchFilterProps> = ({
           onClick={() => setRemoteFilter(remoteFilter === 'Remote' ? 'ALL' : 'Remote')}
           className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5 ${
             remoteFilter === 'Remote'
-              ? 'bg-purple-50 text-purple-800 border-purple-200 font-bold'
+              ? 'bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/30 font-bold'
               : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+          <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6]" />
           <span>{remoteFilter === 'Remote' ? 'Remote Only' : 'Full Remote / Hybrid'}</span>
         </button>
 
         {isFiltered && (
           <button
             onClick={resetFilters}
-            className="px-3 py-1.5 text-xs text-purple-600 hover:underline flex items-center gap-1 font-semibold"
+            className="px-3 py-1.5 text-xs text-[#8B5CF6] hover:underline flex items-center gap-1 font-semibold"
           >
             <X className="w-3.5 h-3.5" /> Reset Filters
           </button>

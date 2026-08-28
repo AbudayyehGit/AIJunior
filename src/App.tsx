@@ -28,6 +28,7 @@ import {
 import { Navbar, NavTabType } from './components/Navbar';
 import { GlobalSearchFilter } from './components/GlobalSearchFilter';
 import { JobCard } from './components/JobCard';
+import { JobFeed } from './components/JobFeed';
 import { JobDetailModal } from './components/JobDetailModal';
 import { SkillSimulatorsView } from './components/SkillSimulatorsView';
 import { SimulatorModal } from './components/SimulatorModal';
@@ -336,83 +337,24 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
         {/* VIEW 1: CURATED NOISE-FREE JOB FEED */}
         {activeTab === 'jobs' && (
-          <div className="space-y-6 animate-in fade-in duration-150">
-            {/* Clean Minimalist Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700">
-                    Live Verified Junior Pipeline
-                  </span>
-                </div>
-                <h2 className="text-2xl font-bold tracking-tight text-[#1E293B]">
-                  Curated Junior AI Roles
-                </h2>
-                <p className="text-slate-500 text-sm max-w-2xl">
-                  Showing strictly verified roles with ≤ 2 years experience and transparent salaries across LinkedIn, Wellfound, and Indeed.
-                </p>
-              </div>
-
-              {/* Minimal Metric Badges with Purple Accents */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <div className="px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Max Exp: ≤2 Yrs</span>
-                </div>
-                <div className="px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                  <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>100% Disclosed Pay</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Pill-Shaped Global Search & Constraint Filter Bar */}
-            <GlobalSearchFilter
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              selectedSource={selectedSource}
-              setSelectedSource={setSelectedSource}
-              maxExpFilter={maxExpFilter}
-              setMaxExpFilter={setMaxExpFilter}
-              minSalaryFilter={minSalaryFilter}
-              setMinSalaryFilter={setMinSalaryFilter}
-              remoteFilter={remoteFilter}
-              setRemoteFilter={setRemoteFilter}
-              totalFilteredCount={filteredJobs.length}
-              resetFilters={handleResetFilters}
-            />
-
-            {/* Job Cards Grid */}
-            {filteredJobs.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-2xs">
-                <Info className="w-12 h-12 text-slate-400 mx-auto" />
-                <h3 className="text-xl font-bold text-slate-800">No matching junior roles found</h3>
-                <p className="text-sm text-slate-500 max-w-md mx-auto">
-                  Try adjusting your search terms or salary floor. Every role on this board strictly enforces ≤ 2 years of experience.
-                </p>
-                <button
-                  onClick={handleResetFilters}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors"
-                >
-                  Reset All Filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredJobs.map((job) => (
-                  <JobCard
-                    key={job.id}
-                    job={job}
-                    isSaved={savedJobIds.includes(job.id)}
-                    onToggleSave={handleToggleSaveJob}
-                    onSelectJob={(j) => setSelectedJobForDetail(j)}
-                    onLaunchSimulator={handleLaunchSimulator}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          <JobFeed
+            jobs={filteredJobs}
+            savedJobIds={savedJobIds}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedSource={selectedSource}
+            setSelectedSource={setSelectedSource}
+            maxExpFilter={maxExpFilter}
+            setMaxExpFilter={setMaxExpFilter}
+            minSalaryFilter={minSalaryFilter}
+            setMinSalaryFilter={setMinSalaryFilter}
+            remoteFilter={remoteFilter}
+            setRemoteFilter={setRemoteFilter}
+            onToggleSaveJob={handleToggleSaveJob}
+            onSelectJob={(j) => setSelectedJobForDetail(j)}
+            onLaunchSimulator={handleLaunchSimulator}
+            onResetFilters={handleResetFilters}
+          />
         )}
 
         {/* VIEW 2: INTERACTIVE SKILL SIMULATORS */}

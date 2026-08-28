@@ -527,6 +527,13 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
     milestone: 'Tabernacle Theme & Aesthetic Integration',
     deliverables: 'Refactored visual architecture to the sacred Tabernacle Palette (Tekhelet Blue #1D4ED8, Royal Argaman Purple #7C3AED, Vibrant Scarlet #DC2626, Fine Linen #F8FAFC, Sacred Gold #F59E0B), implemented the 45-degree left-angled rocket brand logo, updated navigation & simulator sandboxes with gold attestation badging, and enforced generous p-6+ whitespace.',
     status: 'Completed'
+  },
+  {
+    version: 'v0.9.1',
+    buildDate: '2026-08-28',
+    milestone: 'Mobile Layout Optimization & Lightened Purple Refinement',
+    deliverables: 'Engineered compact, decluttered JobCardMobile component with thumb-friendly touch ergonomics, zero horizontal overflow, and integrated responsive JobFeed view switcher (<768px). Shifted interactive primary purple buttons, active tab indicators, and Indeed source tags to Lightened Purple (#8B5CF6).',
+    status: 'Completed'
   }
 ];
 

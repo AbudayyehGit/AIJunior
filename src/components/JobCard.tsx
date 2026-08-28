@@ -37,7 +37,7 @@ export const JobCard: React.FC<JobCardProps> = ({
       case 'Wellfound':
         return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'Indeed':
-        return 'bg-purple-50 text-[#7C3AED] border-purple-200';
+        return 'bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/30';
       default:
         return 'bg-slate-100 text-slate-700 border-slate-200';
     }
@@ -50,7 +50,7 @@ export const JobCard: React.FC<JobCardProps> = ({
   return (
     <div
       id={`job-card-${job.id}`}
-      className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm hover:border-[#7C3AED] hover:shadow-md transition-all relative flex flex-col justify-between space-y-4 group"
+      className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm hover:border-[#8B5CF6] hover:shadow-md transition-all relative flex flex-col justify-between space-y-4 group"
     >
       {/* Top right badges & bookmark */}
       <div className="absolute top-5 right-5 flex items-center gap-2">
@@ -74,7 +74,7 @@ export const JobCard: React.FC<JobCardProps> = ({
           className={`p-1.5 rounded-xl border transition-colors ${
             isSaved
               ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-xs'
-              : 'border-slate-200 text-slate-400 hover:text-[#7C3AED] hover:bg-purple-50/50'
+              : 'border-slate-200 text-slate-400 hover:text-[#8B5CF6] hover:bg-purple-50/50'
           }`}
           title={isSaved ? 'Remove from saved' : 'Save job'}
         >
@@ -128,7 +128,7 @@ export const JobCard: React.FC<JobCardProps> = ({
           {job.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 text-slate-700 rounded-lg group-hover:bg-purple-50 group-hover:text-[#7C3AED] transition-colors"
+              className="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 text-slate-700 rounded-lg group-hover:bg-purple-50 group-hover:text-[#8B5CF6] transition-colors"
             >
               {tag}
             </span>
@@ -147,9 +147,9 @@ export const JobCard: React.FC<JobCardProps> = ({
         {job.simulatorsRecommended && job.simulatorsRecommended.length > 0 && (
           <button
             onClick={() => onLaunchSimulator(job.simulatorsRecommended![0])}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#7C3AED] bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors border border-purple-200/80 shadow-2xs"
+            className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#8B5CF6] bg-[#8B5CF6]/10 hover:bg-[#8B5CF6]/20 rounded-xl transition-colors border border-[#8B5CF6]/20 shadow-2xs"
           >
-            <Cpu className="w-3.5 h-3.5 text-[#7C3AED]" />
+            <Cpu className="w-3.5 h-3.5 text-[#8B5CF6]" />
             <span>Test Skills &amp; Earn Sacred Gold Badge</span>
           </button>
         )}
@@ -166,7 +166,7 @@ export const JobCard: React.FC<JobCardProps> = ({
             href={job.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2.5 px-4 bg-[#7C3AED] text-white rounded-xl font-bold text-xs text-center hover:bg-[#6D28D9] transition-colors flex items-center justify-center gap-1.5 shadow-tabernacle-argaman"
+            className="flex-1 py-2.5 px-4 bg-[#8B5CF6] text-white rounded-xl font-bold text-xs text-center hover:bg-[#7C3AED] transition-colors flex items-center justify-center gap-1.5 shadow-sm"
           >
             <span>View on {job.source}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />

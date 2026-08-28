@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
                 userRole === 'job_seeker'
-                  ? 'bg-[#7C3AED] text-white shadow-tabernacle-argaman'
+                  ? 'bg-[#8B5CF6] text-white shadow-sm'
                   : 'text-blue-100 hover:text-white hover:bg-blue-800/50'
               }`}
             >
@@ -76,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
                 userRole === 'recruiter'
-                  ? 'bg-[#7C3AED] text-white shadow-tabernacle-argaman'
+                  ? 'bg-[#8B5CF6] text-white shadow-sm'
                   : 'text-blue-100 hover:text-white hover:bg-blue-800/50'
               }`}
             >
@@ -111,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 userRole === 'admin' 
                   ? 'bg-slate-900 ring-amber-400 text-amber-300' 
                   : userRole === 'recruiter'
-                  ? 'bg-[#7C3AED] ring-purple-300'
+                  ? 'bg-[#8B5CF6] ring-purple-300'
                   : 'bg-amber-500 ring-amber-200 text-slate-950 font-black'
               }`}>
                 {userRole === 'admin' ? 'ADM' : userRole === 'recruiter' ? 'REC' : 'AV'}
@@ -242,7 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <FileCode className="w-3.5 h-3.5 text-amber-300" />
-            <span className="font-mono">v0.9.0 Specs</span>
+            <span className="font-mono">v0.9.1 Specs</span>
           </button>
         </div>
       </div>
