@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-ocean-slate: #2563EB;
+    --color-ocean-dark: #1D4ED8;
+    --color-vibrant-mint: #10B981;
+    --color-mint-dark: #059669;
+    --color-soft-amber: #F59E0B;
+    --color-soft-amber-dark: #D97706;
+    --color-canvas-bg: #F8FAFC;
+    --color-card-bg: #FFFFFF;
+  }
+}
+
+/* Smooth transition defaults and scrollbar styling */
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
