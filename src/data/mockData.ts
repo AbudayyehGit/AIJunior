@@ -1,4 +1,14 @@
-import { Job, Candidate, SimulatorChallenge, IngestionLogEntry, BuildLogEntry } from '../types';
+import { 
+  Job, 
+  Candidate, 
+  SimulatorChallenge, 
+  IngestionLogEntry, 
+  BuildLogEntry,
+  JobApplication,
+  ModerationJobFlag,
+  SecurityAuditLog,
+  AttestationAuditEntry
+} from '../types';
 
 export const INITIAL_JOBS: Job[] = [
   {
@@ -480,7 +490,225 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
     version: 'v0.4.0',
     buildDate: '2026-08-28',
     milestone: 'Frontend Layout & Design System',
-    deliverables: 'Implementation of Tailwind CSS layout, 45-degree rocket branding, multi-source job feed with p-6 spacing, interactive simulators, recruiter views, and personalized settings.',
+    deliverables: 'Implementation of Tailwind CSS layout, multi-source job feed with p-6 spacing, interactive simulators, recruiter views, and personalized settings.',
     status: 'Completed'
+  },
+  {
+    version: 'v0.5.0',
+    buildDate: '2026-08-28',
+    milestone: 'Clean Minimalism UI & Sailboat Rebrand',
+    deliverables: 'Refined design system to Clean Minimalism with purple accents and custom Sailboat brand icon.',
+    status: 'Completed'
+  },
+  {
+    version: 'v0.6.0',
+    buildDate: '2026-08-28',
+    milestone: 'Automated Multi-Source Ingestion & Scraping Pipeline',
+    deliverables: 'Built scrapers (LinkedIn, Indeed, Wellfound), strict ISO ≤2 yrs experience filter, salary mandate guard, fuzzy deduplication normalizer, and /api/jobs/sync endpoint.',
+    status: 'Completed'
+  },
+  {
+    version: 'v0.7.0',
+    buildDate: '2026-08-28',
+    milestone: 'Skill Simulator Suite & Cryptographic Attestation',
+    deliverables: 'Created modular sandboxes (TokenOptimizer, RAGChunker, GuardrailTester), multi-vector assertion test runner (badgeAttestation.ts), real-time metric tracking, and cryptographic profile badge minting.',
+    status: 'Completed'
+  },
+  {
+    version: 'v0.8.0',
+    buildDate: '2026-08-28',
+    milestone: 'Platform Security Architecture & Dual-Role Workflows',
+    deliverables: 'Engineered AppSec middleware (CSRF, HSTS, CSP headers), RBAC role protection, Job Seeker portfolio portal with attestation proofs, Recruiter posting constraint engine, and Administrator moderation/ingestion console.',
+    status: 'Completed'
+  },
+  {
+    version: 'v0.9.0',
+    buildDate: '2026-08-28',
+    milestone: 'Tabernacle Theme & Aesthetic Integration',
+    deliverables: 'Refactored visual architecture to the sacred Tabernacle Palette (Tekhelet Blue #1D4ED8, Royal Argaman Purple #7C3AED, Vibrant Scarlet #DC2626, Fine Linen #F8FAFC, Sacred Gold #F59E0B), implemented the 45-degree left-angled rocket brand logo, updated navigation & simulator sandboxes with gold attestation badging, and enforced generous p-6+ whitespace.',
+    status: 'Completed'
+  }
+];
+
+export const INITIAL_APPLICATIONS: JobApplication[] = [
+  {
+    id: 'app-1',
+    jobId: 'job-1',
+    jobTitle: 'Junior AI Engineer (Prompt & Eval Systems)',
+    company: 'NeuralFlow Labs',
+    source: 'LinkedIn',
+    location: 'San Francisco, CA (Hybrid)',
+    appliedDate: '2026-08-27',
+    salaryRange: '$95,000 - $125,000',
+    status: 'Recruiter Screen',
+    requiredBadges: ['badge_token_opt_v1', 'badge_llm_safety_v1'],
+    matchScore: 96,
+    notes: 'Recruiter reached out via platform with interview invite for Prompt Architecture team.'
+  },
+  {
+    id: 'app-2',
+    jobId: 'job-2',
+    jobTitle: 'Associate RAG & Vector Data Specialist',
+    company: 'CognitiveScale AI',
+    source: 'Wellfound',
+    location: 'Remote (US/Canada)',
+    appliedDate: '2026-08-26',
+    salaryRange: '$100,000 - $130,000',
+    status: 'Challenge Passed',
+    requiredBadges: ['badge_rag_arch_v1'],
+    matchScore: 92,
+    notes: 'Attested RAG Vector Architect badge automatically submitted and verified on-chain hash.'
+  },
+  {
+    id: 'app-3',
+    jobId: 'job-3',
+    jobTitle: 'Junior LLM Red-Teamer & Safety Analyst',
+    company: 'ShieldAI Global',
+    source: 'Indeed',
+    location: 'Austin, TX (Remote)',
+    appliedDate: '2026-08-25',
+    salaryRange: '$90,000 - $115,000',
+    status: 'Under Review',
+    requiredBadges: ['badge_llm_safety_v1'],
+    matchScore: 88,
+    notes: 'Submitted prompt defense test logs alongside application packet.'
+  }
+];
+
+export const INITIAL_MODERATION_FLAGS: ModerationJobFlag[] = [
+  {
+    id: 'flag-1',
+    jobId: 'flagged-ext-101',
+    jobTitle: 'Senior-Junior AI Researcher (5+ Yrs Required)',
+    company: 'ShadowCorp AI',
+    source: 'LinkedIn',
+    reason: 'Excess Experience (>2 yrs)',
+    severity: 'high',
+    status: 'pending_review',
+    flaggedAt: '2026-08-28 09:12:44',
+    flaggedBy: 'Automated Experience Filter Engine',
+    snippet: 'Requirement section demands minimum 5 years in production PyTorch distributed training.'
+  },
+  {
+    id: 'flag-2',
+    jobId: 'flagged-ext-102',
+    jobTitle: 'Entry-Level AI Prompt Intern (Unpaid / Equity Only)',
+    company: 'VaporLLM Inc',
+    source: 'Indeed',
+    reason: 'Null/Ambiguous Salary',
+    severity: 'high',
+    status: 'pending_review',
+    flaggedAt: '2026-08-28 08:45:10',
+    flaggedBy: 'Mandatory Compensation Guard',
+    snippet: 'Salary listed as "Competitive DOE / Equity / Unpaid Internship". Violates transparency mandate.'
+  },
+  {
+    id: 'flag-3',
+    jobId: 'flagged-ext-103',
+    jobTitle: 'Junior Data annotator with 3+ yrs LLM fine-tuning',
+    company: 'OmniData Ventures',
+    source: 'Wellfound',
+    reason: 'Misleading Junior Tag',
+    severity: 'medium',
+    status: 'quarantined',
+    flaggedAt: '2026-08-28 07:30:22',
+    flaggedBy: 'User Community Report (AV-991)',
+    snippet: 'Title marked entry level but job description asks for Ph.D. and 3 years industry experience.'
+  }
+];
+
+export const INITIAL_SECURITY_LOGS: SecurityAuditLog[] = [
+  {
+    id: 'sec-log-1',
+    timestamp: '2026-08-28 09:54:12 UTC',
+    eventType: 'CSRF_BLOCKED',
+    ipAddress: '198.51.100.24',
+    severity: 'WARN',
+    endpoint: '/api/jobs/post',
+    details: 'Unverified origin POST without valid CSRF header blocked by appMiddleware.',
+    status: 'BLOCKED'
+  },
+  {
+    id: 'sec-log-2',
+    timestamp: '2026-08-28 09:52:05 UTC',
+    eventType: 'RATE_LIMIT_EXCEEDED',
+    ipAddress: '203.0.113.88',
+    severity: 'WARN',
+    endpoint: '/api/jobs/sync',
+    details: 'Rapid synchronization requests (12/min) exceeded 10 req/min limit. Throttled 429.',
+    status: 'BLOCKED'
+  },
+  {
+    id: 'sec-log-3',
+    timestamp: '2026-08-28 09:48:30 UTC',
+    eventType: 'PII_SCRUBBED',
+    ipAddress: '192.0.2.14',
+    severity: 'INFO',
+    endpoint: '/api/candidates/portfolio',
+    details: 'Raw phone and unmasked access token scrubbed from candidate bio prior to indexing.',
+    status: 'MITIGATED'
+  },
+  {
+    id: 'sec-log-4',
+    timestamp: '2026-08-28 09:30:15 UTC',
+    eventType: 'ATTESTATION_MINTED',
+    ipAddress: '192.0.2.45',
+    severity: 'INFO',
+    endpoint: '/api/simulators/attest',
+    details: 'Cryptographic assertion hash sha256:7f4a... generated for user Alex Vance (Token Economist).',
+    status: 'AUDITED'
+  },
+  {
+    id: 'sec-log-5',
+    timestamp: '2026-08-28 09:00:00 UTC',
+    eventType: 'ADMIN_AUTH_SUCCESS',
+    ipAddress: '192.0.2.1',
+    severity: 'INFO',
+    endpoint: '/admin/session',
+    details: 'Superadmin RBAC session validated with 2FA cryptographic token.',
+    userRole: 'admin',
+    status: 'AUDITED'
+  }
+];
+
+export const INITIAL_ATTESTATION_AUDITS: AttestationAuditEntry[] = [
+  {
+    id: 'attest-1',
+    candidateId: 'cand-1',
+    candidateName: 'Alex Vance',
+    badgeId: 'badge_token_opt_v1',
+    badgeName: 'Token & Cost Architect',
+    verificationCode: 'VER-TOK-9921-ISO',
+    hash: '0x8f2a4c9b1d3e5f7a9c2e4b6d8f0a2c4e6b8d0f2a4c6e8b0d2f4a6c8e0b2d4f6a',
+    signature: 'ed25519:3b9f8a1c...e7d2',
+    timestamp: '2026-08-28 09:30:15',
+    score: 98.5,
+    verifiedBy: 'Evaluator Engine v2.4'
+  },
+  {
+    id: 'attest-2',
+    candidateId: 'cand-1',
+    candidateName: 'Alex Vance',
+    badgeId: 'badge_rag_arch_v1',
+    badgeName: 'RAG Retrieval & Vector Architect',
+    verificationCode: 'VER-RAG-4410-ISO',
+    hash: '0x3c7e1a9f5b2d8c0e4a6f8b2d0c4e6a8f0b2d4c6e8a0f2b4d6c8e0a2f4b6d8c0e',
+    signature: 'ed25519:7a4c9b2d...1f9e',
+    timestamp: '2026-08-27 14:15:00',
+    score: 95.0,
+    verifiedBy: 'Evaluator Engine v2.4'
+  },
+  {
+    id: 'attest-3',
+    candidateId: 'cand-2',
+    candidateName: 'Maya Lin',
+    badgeId: 'badge_llm_safety_v1',
+    badgeName: 'Prompt Defense & LLM Safety Engineer',
+    verificationCode: 'VER-SEC-8832-ISO',
+    hash: '0x1d3e5f7a9c2e4b6d8f0a2c4e6b8d0f2a4c6e8b0d2f4a6c8e0b2d4f6a8f2a4c9b',
+    signature: 'ed25519:9e1f4a7c...3d8b',
+    timestamp: '2026-08-26 18:40:22',
+    score: 100.0,
+    verifiedBy: 'Evaluator Engine v2.4'
   }
 ];

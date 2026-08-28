@@ -1,6 +1,6 @@
 export type JobSource = 'LinkedIn' | 'Indeed' | 'Wellfound' | 'Direct';
 export type RemoteType = 'Remote' | 'Hybrid' | 'On-Site';
-export type UserRole = 'job_seeker' | 'recruiter';
+export type UserRole = 'job_seeker' | 'recruiter' | 'admin';
 
 export interface Job {
   id: string;
@@ -27,6 +27,8 @@ export interface Job {
   isVerifiedEntry: boolean;
   isSalaryGuaranteed: boolean;
   isNew?: boolean;
+  moderationStatus?: 'approved' | 'flagged' | 'quarantined' | 'purged';
+  moderationReason?: string;
 }
 
 export interface SkillBadge {
@@ -55,6 +57,61 @@ export interface SimulatorScore {
   date: string;
 }
 
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  company: string;
+  source: JobSource;
+  location: string;
+  appliedDate: string;
+  salaryRange: string;
+  status: 'Submitted' | 'Under Review' | 'Recruiter Screen' | 'Challenge Passed' | 'Offer Extended' | 'Archived';
+  requiredBadges: string[];
+  notes?: string;
+  matchScore: number;
+}
+
+export interface ModerationJobFlag {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  company: string;
+  source: JobSource;
+  reason: 'Excess Experience (>2 yrs)' | 'Null/Ambiguous Salary' | 'Misleading Junior Tag' | 'Unresponsive Redirect' | 'Suspicious Pay-to-Apply';
+  severity: 'high' | 'medium' | 'low';
+  status: 'pending_review' | 'resolved_approved' | 'quarantined' | 'purged';
+  flaggedAt: string;
+  flaggedBy: string;
+  snippet: string;
+}
+
+export interface SecurityAuditLog {
+  id: string;
+  timestamp: string;
+  eventType: 'RATE_LIMIT_EXCEEDED' | 'CSRF_BLOCKED' | 'RBAC_ACCESS_DENIED' | 'PII_SCRUBBED' | 'ATTESTATION_MINTED' | 'ADMIN_AUTH_SUCCESS';
+  ipAddress: string;
+  severity: 'CRITICAL' | 'WARN' | 'INFO';
+  endpoint: string;
+  details: string;
+  userRole?: UserRole;
+  status: 'BLOCKED' | 'MITIGATED' | 'AUDITED';
+}
+
+export interface AttestationAuditEntry {
+  id: string;
+  candidateId: string;
+  candidateName: string;
+  badgeId: string;
+  badgeName: string;
+  verificationCode: string;
+  hash: string;
+  signature: string;
+  timestamp: string;
+  score: number;
+  verifiedBy: string;
+}
+
 export interface Candidate {
   id: string;
   name: string;
@@ -73,6 +130,7 @@ export interface Candidate {
   simulatorScores: SimulatorScore[];
   availability: 'Immediate' | '2 Weeks' | 'Flexible';
   verified: boolean;
+  email?: string;
 }
 
 export interface SimulatorChallenge {

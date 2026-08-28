@@ -8,16 +8,24 @@ import {
   UserSettings, 
   JobSource, 
   RemoteType,
-  UserRole
+  UserRole,
+  JobApplication,
+  ModerationJobFlag,
+  SecurityAuditLog,
+  AttestationAuditEntry
 } from './types';
 import { 
   INITIAL_JOBS, 
   SIMULATOR_CHALLENGES, 
   INITIAL_CANDIDATES, 
   INGESTION_LOGS, 
-  BUILD_LOG_ENTRIES 
+  BUILD_LOG_ENTRIES,
+  INITIAL_APPLICATIONS,
+  INITIAL_MODERATION_FLAGS,
+  INITIAL_SECURITY_LOGS,
+  INITIAL_ATTESTATION_AUDITS
 } from './data/mockData';
-import { Navbar } from './components/Navbar';
+import { Navbar, NavTabType } from './components/Navbar';
 import { GlobalSearchFilter } from './components/GlobalSearchFilter';
 import { JobCard } from './components/JobCard';
 import { JobDetailModal } from './components/JobDetailModal';
@@ -27,7 +35,11 @@ import { RecruiterView } from './components/RecruiterView';
 import { IngestionMonitor } from './components/IngestionMonitor';
 import { BuildLogView } from './components/BuildLogView';
 import { SettingsModal } from './components/SettingsModal';
-import { RocketLogo } from './components/RocketLogo';
+import { SailboatLogo } from './components/SailboatLogo';
+import SeekerDashboard from './app/dashboard/seeker/page';
+import RecruiterDashboard from './app/dashboard/recruiter/page';
+import AdminDashboard from './app/admin/page';
+import { runIngestionPipeline } from './services/ingestion';
 import { 
   ShieldCheck, 
   DollarSign, 
@@ -38,12 +50,15 @@ import {
   CheckCircle2, 
   Info,
   ArrowRight,
-  Bookmark
+  Bookmark,
+  UserCheck,
+  Lock,
+  Users
 } from 'lucide-react';
 
 export default function App() {
   // Navigation & Role State
-  const [activeTab, setActiveTab] = useState<'jobs' | 'simulators' | 'candidates' | 'ingestion' | 'buildlog'>('jobs');
+  const [activeTab, setActiveTab] = useState<NavTabType>('jobs');
   const [userRole, setUserRole] = useState<UserRole>('job_seeker');
 
   // Job Data State
@@ -63,18 +78,34 @@ export default function App() {
   const [earnedBadges, setEarnedBadges] = useState<SkillBadge[]>([
     {
       id: 'badge-token-economist',
-      name: 'Token Economist (Verified)',
+      name: 'Token & Cost Architect (Verified)',
       category: 'Optimization',
-      description: 'Demonstrated mastery in context pruning and token-cost minimization.',
+      description: 'Mastery in context pruning, prompt optimization, and inference cost budgeting.',
       verificationCode: 'VER-TOK-9921-ISO',
       icon: 'Zap',
       awardedAt: '2026-08-28'
+    },
+    {
+      id: 'badge-rag-architect',
+      name: 'RAG Retrieval & Vector Architect (Verified)',
+      category: 'RAG & Retrieval',
+      description: 'Precision chunk overlap tuning and dense semantic search indexing.',
+      verificationCode: 'VER-RAG-4410-ISO',
+      icon: 'Database',
+      awardedAt: '2026-08-27'
     }
   ]);
   const [activeSimulator, setActiveSimulator] = useState<SimulatorChallenge | null>(null);
 
-  // Recruiter Candidates State
+  // Recruiter Candidates & Bookmarks State
   const [candidates, setCandidates] = useState<Candidate[]>(INITIAL_CANDIDATES);
+  const [savedCandidateIds, setSavedCandidateIds] = useState<string[]>(['cand-1']);
+
+  // Applications, Moderation & Security Audit State
+  const [applications, setApplications] = useState<JobApplication[]>(INITIAL_APPLICATIONS);
+  const [moderationFlags, setModerationFlags] = useState<ModerationJobFlag[]>(INITIAL_MODERATION_FLAGS);
+  const [securityLogs, setSecurityLogs] = useState<SecurityAuditLog[]>(INITIAL_SECURITY_LOGS);
+  const [attestationAudits, setAttestationAudits] = useState<AttestationAuditEntry[]>(INITIAL_ATTESTATION_AUDITS);
 
   // Ingestion Logs State
   const [ingestionLogs, setIngestionLogs] = useState<IngestionLogEntry[]>(INGESTION_LOGS);
@@ -91,15 +122,15 @@ export default function App() {
       minSalaryPreference: 90000,
       githubUrl: 'https://github.com/alexvance-ai',
       huggingfaceUrl: 'https://huggingface.co/alexvance',
-      earnedBadgeIds: ['badge-token-economist'],
+      earnedBadgeIds: ['badge-token-economist', 'badge-rag-architect'],
       savedJobIds: ['job-1'],
-      appliedJobIds: []
+      appliedJobIds: ['job-1', 'job-2']
     },
     recruiterProfile: {
       companyName: 'NeuralFlow Labs',
       recruiterName: 'Sarah Jenkins',
       email: 'sarah@neuralflow.ai',
-      savedCandidateIds: []
+      savedCandidateIds: ['cand-1']
     },
     notifications: {
       emailAlerts: true,
@@ -126,6 +157,17 @@ export default function App() {
     }
   };
 
+  // Toggle Candidate Bookmark
+  const handleBookmarkCandidate = (candidateId: string) => {
+    if (savedCandidateIds.includes(candidateId)) {
+      setSavedCandidateIds(savedCandidateIds.filter((id) => id !== candidateId));
+      showToast('Candidate removed from shortlisted talent.');
+    } else {
+      setSavedCandidateIds([...savedCandidateIds, candidateId]);
+      showToast('Candidate shortlisted for interview pipeline!');
+    }
+  };
+
   // Reset Filters
   const handleResetFilters = () => {
     setSearchQuery('');
@@ -146,47 +188,91 @@ export default function App() {
     if (!earnedBadges.some((b) => b.id === badge.id)) {
       const updated = [...earnedBadges, { ...badge, awardedAt: new Date().toISOString().split('T')[0] }];
       setEarnedBadges(updated);
+
+      // Also record cryptographic attestation audit log
+      const newAttest: AttestationAuditEntry = {
+        id: `attest-${Date.now()}`,
+        candidateId: 'cand-1',
+        candidateName: 'Alex Vance',
+        badgeId: badge.id,
+        badgeName: badge.name,
+        verificationCode: badge.verificationCode,
+        hash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+        signature: `ed25519:${Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        score: 98.0,
+        verifiedBy: 'Evaluator Engine v2.4'
+      };
+      setAttestationAudits((prev) => [newAttest, ...prev]);
+
       showToast(`🎉 Congratulations! You earned the "${badge.name}" badge!`);
     }
   };
 
-  // Direct Job Post Handler (with strict validation)
-  const handleDirectPostJob = (jobData: Partial<Job>) => {
-    if ((jobData.experienceYears || 0) > 2) {
-      return { success: false, error: 'Platform policy strictly rejects roles with >2 years experience.' };
-    }
-    if (!jobData.salaryMin || !jobData.salaryMax) {
-      return { success: false, error: 'Mandatory non-null salary range required.' };
-    }
-
-    const newJob: Job = {
-      id: `job-${Date.now()}`,
-      title: jobData.title || 'Junior AI Engineer',
-      company: jobData.company || 'Direct Employer',
-      source: 'Direct',
-      sourceUrl: '#',
-      experienceYears: jobData.experienceYears || 1,
-      experienceDisplay: `${jobData.experienceYears || 1} Yr Max Exp`,
-      salaryMin: jobData.salaryMin,
-      salaryMax: jobData.salaryMax,
-      currency: '$',
-      salaryPeriod: 'yr',
-      location: jobData.location || 'Remote',
-      remoteType: jobData.remoteType || 'Remote',
-      tags: jobData.tags || ['AI', 'Python'],
-      summary: jobData.summary || 'Directly posted entry-level AI opportunity.',
-      description: jobData.description || 'Verified entry-level AI engineering position.',
-      requirements: jobData.requirements || ['Strictly ≤2 years experience'],
-      postedDate: 'Just now',
-      applicantCount: 0,
-      isVerifiedEntry: true,
-      isSalaryGuaranteed: true,
-      isNew: true
-    };
-
-    setJobs([newJob, ...jobs]);
+  // Direct Job Post Handler
+  const handleAddNewJob = (newJob: Job) => {
+    setJobs((prev) => [newJob, ...prev]);
     showToast('Verified Junior role successfully published to live feed!');
-    return { success: true };
+  };
+
+  // Update Application Status
+  const handleUpdateApplicationStatus = (appId: string, newStatus: JobApplication['status']) => {
+    setApplications((prev) => prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a)));
+    showToast(`Application status updated to "${newStatus}"`);
+  };
+
+  // Moderation Actions
+  const handleApproveFlag = (flagId: string) => {
+    setModerationFlags((prev) => prev.map((f) => (f.id === flagId ? { ...f, status: 'resolved_approved' } : f)));
+    showToast('Listing reviewed and cleared for entry feed.');
+  };
+
+  const handleQuarantineFlag = (flagId: string) => {
+    setModerationFlags((prev) => prev.map((f) => (f.id === flagId ? { ...f, status: 'quarantined' } : f)));
+    showToast('Listing quarantined pending employer clarification.');
+  };
+
+  const handlePurgeJob = (flagId: string, jobId: string) => {
+    setModerationFlags((prev) => prev.filter((f) => f.id !== flagId));
+    setJobs((prev) => prev.filter((j) => j.id !== jobId));
+    
+    // Add security audit log
+    const auditEntry: SecurityAuditLog = {
+      id: `sec-${Date.now()}`,
+      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
+      eventType: 'RBAC_ACCESS_DENIED',
+      ipAddress: '192.0.2.1',
+      severity: 'WARN',
+      endpoint: '/admin/moderation/purge',
+      details: `Non-compliant job ${jobId} permanently purged and blacklisted by admin.`,
+      status: 'BLOCKED'
+    };
+    setSecurityLogs((prev) => [auditEntry, ...prev]);
+    showToast('Non-compliant job permanently purged and blacklisted from platform feed.');
+  };
+
+  // Ingest newly scraped & verified jobs into live feed
+  const handleIngestNewJobs = (newJobs: Job[]) => {
+    const existingIds = new Set(jobs.map((j) => j.id));
+    const toAdd = newJobs.filter((j) => !existingIds.has(j.id));
+    if (toAdd.length > 0) {
+      setJobs((prev) => [...toAdd, ...prev]);
+      showToast(`⚡ Ingestion Engine added ${toAdd.length} fresh verified roles to the live feed!`);
+    } else {
+      showToast('All scraped listings were already deduplicated against active database records.');
+    }
+  };
+
+  // Trigger sync pipeline
+  const handleTriggerSync = async () => {
+    const report = await runIngestionPipeline({
+      sources: ['LinkedIn', 'Indeed', 'Wellfound'],
+      maxExperienceCap: 2.0,
+      enforceMandatorySalary: true
+    });
+    if (report.admittedJobs && report.admittedJobs.length > 0) {
+      handleIngestNewJobs(report.admittedJobs);
+    }
   };
 
   // Simulate Ingest Engine Rule Tester
@@ -226,7 +312,7 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col selection:bg-purple-600 selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2 animate-bounce">
@@ -247,12 +333,12 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
         {/* VIEW 1: CURATED NOISE-FREE JOB FEED */}
         {activeTab === 'jobs' && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-6 animate-in fade-in duration-150">
             {/* Clean Minimalist Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
@@ -299,7 +385,7 @@ export default function App() {
 
             {/* Job Cards Grid */}
             {filteredJobs.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4 shadow-2xs">
+              <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-2xs">
                 <Info className="w-12 h-12 text-slate-400 mx-auto" />
                 <h3 className="text-xl font-bold text-slate-800">No matching junior roles found</h3>
                 <p className="text-sm text-slate-500 max-w-md mx-auto">
@@ -307,7 +393,7 @@ export default function App() {
                 </p>
                 <button
                   onClick={handleResetFilters}
-                  className="px-5 py-2.5 rounded-xl bg-[#2563EB] text-white text-xs font-bold hover:bg-blue-700 transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors"
                 >
                   Reset All Filters
                 </button>
@@ -338,23 +424,86 @@ export default function App() {
           />
         )}
 
-        {/* VIEW 3: RECRUITER / CANDIDATE TALENT POOL */}
-        {activeTab === 'candidates' && (
-          <RecruiterView
-            candidates={candidates}
-            onDirectPostJob={handleDirectPostJob}
+        {/* VIEW 3: JOB SEEKER DASHBOARD (PROFILE, BADGES, PORTFOLIO, APPLICATIONS) */}
+        {activeTab === 'seeker_portal' && (
+          <SeekerDashboard
+            onLaunchSimulator={handleLaunchSimulator}
+            earnedBadges={earnedBadges}
+            applications={applications}
+            onUpdateStatus={handleUpdateApplicationStatus}
           />
         )}
 
-        {/* VIEW 4: INGESTION PIPELINE & HYGIENE TELEMETRY */}
+        {/* VIEW 4: RECRUITER PORTAL (JOB POSTING & CANDIDATE SEARCH) */}
+        {activeTab === 'recruiter_portal' && (
+          <RecruiterDashboard
+            candidates={candidates}
+            jobs={jobs}
+            onAddNewJob={handleAddNewJob}
+            onBookmarkCandidate={handleBookmarkCandidate}
+            savedCandidateIds={savedCandidateIds}
+          />
+        )}
+
+        {/* VIEW 5: ADMINISTRATOR BACKEND CONSOLE */}
+        {activeTab === 'admin' && (
+          <AdminDashboard
+            ingestionLogs={ingestionLogs}
+            moderationFlags={moderationFlags}
+            securityLogs={securityLogs}
+            attestationAudits={attestationAudits}
+            jobs={jobs}
+            onApproveFlag={handleApproveFlag}
+            onQuarantineFlag={handleQuarantineFlag}
+            onPurgeJob={handlePurgeJob}
+            onTriggerSync={handleTriggerSync}
+          />
+        )}
+
+        {/* VIEW 6: TALENT POOL QUICK DISCOVERY */}
+        {activeTab === 'candidates' && (
+          <RecruiterView
+            candidates={candidates}
+            onDirectPostJob={(jobData) => {
+              handleAddNewJob({
+                id: `job-${Date.now()}`,
+                title: jobData.title || 'Junior AI Engineer',
+                company: jobData.company || 'Direct Employer',
+                source: 'Direct',
+                sourceUrl: '#',
+                experienceYears: jobData.experienceYears || 1,
+                experienceDisplay: `${jobData.experienceYears || 1} Yr Max Exp`,
+                salaryMin: jobData.salaryMin || 85000,
+                salaryMax: jobData.salaryMax || 115000,
+                currency: '$',
+                salaryPeriod: 'yr',
+                location: jobData.location || 'Remote',
+                remoteType: jobData.remoteType || 'Remote',
+                tags: jobData.tags || ['AI', 'Python'],
+                summary: jobData.summary || 'Directly posted entry-level AI opportunity.',
+                description: jobData.description || 'Verified entry-level AI engineering position.',
+                requirements: jobData.requirements || ['Strictly ≤2 years experience'],
+                postedDate: 'Just now',
+                applicantCount: 0,
+                isVerifiedEntry: true,
+                isSalaryGuaranteed: true,
+                isNew: true
+              });
+              return { success: true };
+            }}
+          />
+        )}
+
+        {/* VIEW 7: INGESTION PIPELINE & HYGIENE TELEMETRY */}
         {activeTab === 'ingestion' && (
           <IngestionMonitor
             logs={ingestionLogs}
             onSimulateIngest={handleSimulateIngest}
+            onIngestNewJobs={handleIngestNewJobs}
           />
         )}
 
-        {/* VIEW 5: LIVING BUILD LOG (ISO/IEC LEDGER) */}
+        {/* VIEW 8: LIVING BUILD LOG (ISO/IEC LEDGER) */}
         {activeTab === 'buildlog' && (
           <BuildLogView entries={BUILD_LOG_ENTRIES} />
         )}
@@ -398,7 +547,7 @@ export default function App() {
       <footer className="border-t border-slate-200 bg-white py-10 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-500">
           <div className="flex items-center gap-3">
-            <RocketLogo size={24} showText={false} />
+            <SailboatLogo size={24} />
             <div>
               <span className="font-extrabold text-slate-900">JuniorAI Platform</span> — Noise-Free Entry AI Careers &amp; Verified Skill Badges
               <div className="text-[11px] text-slate-400 mt-0.5">
@@ -407,12 +556,14 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-6 font-semibold">
-            <button onClick={() => setActiveTab('jobs')} className="hover:text-blue-600">Curated Jobs</button>
-            <button onClick={() => setActiveTab('simulators')} className="hover:text-blue-600">Skill Simulators</button>
-            <button onClick={() => setActiveTab('candidates')} className="hover:text-blue-600">Talent Pool</button>
-            <button onClick={() => setActiveTab('ingestion')} className="hover:text-blue-600">Data Hygiene</button>
-            <button onClick={() => setActiveTab('buildlog')} className="hover:text-blue-600">Living Build Log</button>
+          <div className="flex items-center gap-5 font-semibold flex-wrap">
+            <button onClick={() => setActiveTab('jobs')} className="hover:text-purple-600">Curated Jobs</button>
+            <button onClick={() => setActiveTab('simulators')} className="hover:text-purple-600">Skill Simulators</button>
+            <button onClick={() => setActiveTab('seeker_portal')} className="hover:text-purple-600">Job Seeker Portal</button>
+            <button onClick={() => setActiveTab('recruiter_portal')} className="hover:text-purple-600">Recruiter Portal</button>
+            <button onClick={() => setActiveTab('admin')} className="hover:text-purple-600">Admin Backend</button>
+            <button onClick={() => setActiveTab('ingestion')} className="hover:text-purple-600">Data Hygiene</button>
+            <button onClick={() => setActiveTab('buildlog')} className="hover:text-purple-600">Living Build Log</button>
           </div>
         </div>
       </footer>

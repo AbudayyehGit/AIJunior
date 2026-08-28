@@ -1,16 +1,79 @@
 @import "tailwindcss";
 
+@theme {
+  --color-tekhelet: #1D4ED8;
+  --color-tekhelet-50: #EFF6FF;
+  --color-tekhelet-100: #DBEAFE;
+  --color-tekhelet-200: #BFDBFE;
+  --color-tekhelet-600: #2563EB;
+  --color-tekhelet-700: #1D4ED8;
+  --color-tekhelet-800: #1E40AF;
+  --color-tekhelet-900: #1E3A8A;
+  
+  --color-argaman: #7C3AED;
+  --color-argaman-50: #F5F3FF;
+  --color-argaman-100: #EDE9FE;
+  --color-argaman-200: #DDD6FE;
+  --color-argaman-500: #8B5CF6;
+  --color-argaman-600: #7C3AED;
+  --color-argaman-700: #6D28D9;
+  --color-argaman-800: #5B21B6;
+  --color-argaman-900: #4C1D95;
+
+  --color-scarlet: #DC2626;
+  --color-scarlet-50: #FEF2F2;
+  --color-scarlet-100: #FEE2E2;
+  --color-scarlet-200: #FECACA;
+  --color-scarlet-500: #EF4444;
+  --color-scarlet-600: #DC2626;
+  --color-scarlet-700: #B91C1C;
+  --color-scarlet-800: #991B1B;
+
+  --color-linen: #F8FAFC;
+  --color-linen-50: #FFFFFF;
+  --color-linen-100: #F8FAFC;
+  --color-linen-200: #F1F5F9;
+  --color-linen-300: #E2E8F0;
+  --color-linen-800: #334155;
+  --color-linen-900: #1E293B;
+
+  --color-gold: #F59E0B;
+  --color-gold-50: #FFFBEB;
+  --color-gold-100: #FEF3C7;
+  --color-gold-200: #FDE68A;
+  --color-gold-300: #FCD34D;
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B;
+  --color-gold-600: #D97706;
+  --color-gold-700: #B45309;
+}
+
 @layer base {
   :root {
-    --color-ocean-slate: #2563EB;
-    --color-ocean-dark: #1D4ED8;
-    --color-vibrant-mint: #10B981;
-    --color-mint-dark: #059669;
-    --color-soft-amber: #F59E0B;
-    --color-soft-amber-dark: #D97706;
+    --color-tekhelet: #1D4ED8;
+    --color-argaman: #7C3AED;
+    --color-scarlet: #DC2626;
+    --color-linen: #F8FAFC;
+    --color-gold: #F59E0B;
     --color-canvas-bg: #F8FAFC;
     --color-card-bg: #FFFFFF;
   }
+}
+
+/* Shimmer animation for verified gold badges */
+@keyframes shimmerGold {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.gold-shimmer-badge {
+  background: linear-gradient(90deg, #F59E0B 0%, #FDE68A 50%, #F59E0B 100%);
+  background-size: 200% auto;
+  animation: shimmerGold 3s linear infinite;
 }
 
 /* Smooth transition defaults and scrollbar styling */
