@@ -46,7 +46,7 @@ export const IngestionMonitor: React.FC<IngestionMonitorProps> = ({
   // Live Multi-Source Pipeline execution state
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncReport, setLastSyncReport] = useState<IngestionSyncReport | null>(null);
-  const [activeSources, setActiveSources] = useState<JobSource[]>(['LinkedIn', 'Indeed', 'Wellfound']);
+  const [activeSources, setActiveSources] = useState<JobSource[]>(['LinkedIn', 'Indeed', 'Wellfound', 'RemoteOK', 'HackerNews']);
 
   // Compute aggregate stats
   const totalScanned = logs.reduce((acc, l) => acc + l.rawJobsScanned, 0) + (lastSyncReport?.totalRawHarvested || 0);
@@ -107,9 +107,9 @@ export const IngestionMonitor: React.FC<IngestionMonitorProps> = ({
               <span>v0.6.0 Automated Ingestion & Scraper Engine</span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs text-purple-200/80 font-semibold hidden sm:inline">Active Scrapers:</span>
-              {(['LinkedIn', 'Indeed', 'Wellfound'] as JobSource[]).map((src) => {
+              {(['LinkedIn', 'Indeed', 'Wellfound', 'RemoteOK', 'HackerNews'] as JobSource[]).map((src) => {
                 const active = activeSources.includes(src);
                 return (
                   <button

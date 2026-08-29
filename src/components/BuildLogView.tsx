@@ -21,62 +21,62 @@ export const BuildLogView: React.FC<BuildLogViewProps> = ({ entries }) => {
   return (
     <div id="living-build-log-view" className="space-y-8 animate-fadeIn">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-8 md:p-10 text-white shadow-lg space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold font-mono">
-          <GitBranch className="w-3.5 h-3.5 text-blue-400" />
+      <div className="bg-[#245170] rounded-3xl p-8 md:p-10 text-white shadow-lg space-y-4 border border-[#64A7CC]/40">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1C3E56] text-[#FAF0D4] border border-[#64A7CC]/40 text-xs font-bold font-mono">
+          <GitBranch className="w-3.5 h-3.5 text-[#C59B27]" />
           <span>ISO/IEC/IEEE 29148 Requirements Ledger</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">
           Living Build Log & Iteration Tracker
         </h1>
-        <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl">
+        <p className="text-[#E0EEF5] text-sm md:text-base leading-relaxed max-w-3xl">
           Architectural record tracking all engineering milestones, ISO 25010 product quality verifications, and multi-source ingestion pipeline deployments.
         </p>
       </div>
 
       {/* ISO Quality Standards Card */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center gap-2 text-xs font-extrabold uppercase text-[#2563EB]">
-            <ShieldCheck className="w-4 h-4" /> ISO/IEC 25010 Compliance
+        <div className="bg-[#FBFBFA] p-6 rounded-3xl border border-[#CCD2D8] shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#3A7CA5]">
+            <ShieldCheck className="w-4 h-4 text-[#3A7CA5]" /> ISO/IEC 25010 Compliance
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-[#4A5D70] leading-relaxed">
             Strict runtime verification ensuring zero sub-par listings pass through ingestion boundaries.
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center gap-2 text-xs font-extrabold uppercase text-[#10B981]">
-            <Cpu className="w-4 h-4" /> ISO/IEC/IEEE 29148
+        <div className="bg-[#FBFBFA] p-6 rounded-3xl border border-[#CCD2D8] shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#8A6714]">
+            <Cpu className="w-4 h-4 text-[#C59B27]" /> ISO/IEC/IEEE 29148
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-[#4A5D70] leading-relaxed">
             Unambiguous traceability across requirements, simulator test benches, and candidate badge awards.
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center gap-2 text-xs font-extrabold uppercase text-[#F59E0B]">
-            <Lock className="w-4 h-4" /> Domain Occlusion Protocol
+        <div className="bg-[#FBFBFA] p-6 rounded-3xl border border-[#CCD2D8] shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#2C3E50]">
+            <Lock className="w-4 h-4 text-[#3A7CA5]" /> Domain Occlusion Protocol
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-[#4A5D70] leading-relaxed">
             Public records sanitized for domain acquisition and IP protection across all public artifacts.
           </p>
         </div>
       </div>
 
       {/* Build Log Ledger Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-xs space-y-4">
+      <div className="bg-[#FBFBFA] rounded-3xl border border-[#CCD2D8] p-6 md:p-8 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-            <Terminal className="w-5 h-5 text-slate-700" />
+          <h3 className="text-lg font-black text-[#2C3E50] flex items-center gap-2">
+            <Terminal className="w-5 h-5 text-[#3A7CA5]" />
             <span>Master Release Ledger</span>
           </h3>
-          <span className="text-xs font-mono font-bold text-slate-400">Current Target: v0.4.0</span>
+          <span className="text-xs font-mono font-bold text-[#6E8193]">Current Target: v0.4.0</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-y border-slate-200">
+            <thead className="bg-[#F4F4F0] text-[#6E8193] uppercase tracking-wider font-bold border-y border-[#CCD2D8]">
               <tr>
                 <th className="py-3 px-4">Version</th>
                 <th className="py-3 px-4">Build Date</th>
@@ -85,24 +85,24 @@ export const BuildLogView: React.FC<BuildLogViewProps> = ({ entries }) => {
                 <th className="py-3 px-4 text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-sans">
+            <tbody className="divide-y divide-[#CCD2D8]/60 font-sans">
               {entries.map((entry) => (
-                <tr key={entry.version} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-4 px-4 font-mono font-extrabold text-blue-600 text-sm">
+                <tr key={entry.version} className="hover:bg-[#F4F4F0]/80 transition-colors">
+                  <td className="py-4 px-4 font-mono font-black text-[#3A7CA5] text-sm">
                     {entry.version}
                   </td>
-                  <td className="py-4 px-4 text-slate-500 font-mono">
+                  <td className="py-4 px-4 text-[#6E8193] font-mono">
                     {entry.buildDate}
                   </td>
-                  <td className="py-4 px-4 font-bold text-slate-900">
+                  <td className="py-4 px-4 font-bold text-[#2C3E50]">
                     {entry.milestone}
                   </td>
-                  <td className="py-4 px-4 text-slate-600 leading-relaxed max-w-md">
+                  <td className="py-4 px-4 text-[#4A5D70] leading-relaxed max-w-md">
                     {entry.deliverables}
                   </td>
                   <td className="py-4 px-4 text-right">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FAF0D4] text-[#8A6714] border border-[#C59B27]/40">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#C59B27]" />
                       {entry.status}
                     </span>
                   </td>
@@ -115,3 +115,4 @@ export const BuildLogView: React.FC<BuildLogViewProps> = ({ entries }) => {
     </div>
   );
 };
+

@@ -1,4 +1,4 @@
-export type JobSource = 'LinkedIn' | 'Indeed' | 'Wellfound' | 'Direct';
+export type JobSource = 'LinkedIn' | 'Indeed' | 'Wellfound' | 'RemoteOK' | 'HackerNews' | 'Direct';
 export type RemoteType = 'Remote' | 'Hybrid' | 'On-Site';
 export type UserRole = 'job_seeker' | 'recruiter' | 'admin';
 

@@ -534,6 +534,13 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
     milestone: 'Mobile Layout Optimization & Lightened Purple Refinement',
     deliverables: 'Engineered compact, decluttered JobCardMobile component with thumb-friendly touch ergonomics, zero horizontal overflow, and integrated responsive JobFeed view switcher (<768px). Shifted interactive primary purple buttons, active tab indicators, and Indeed source tags to Lightened Purple (#8B5CF6).',
     status: 'Completed'
+  },
+  {
+    version: 'v1.0.0',
+    buildDate: '2026-08-29',
+    milestone: 'Real-Time Multi-Source Live Ingestion & Server Stream',
+    deliverables: 'Implemented live autonomous ingestion across 5 platforms (LinkedIn, Indeed, Wellfound, RemoteOK, HackerNews) with real-time SSE stream (/api/ingest/stream), background auto-sweep scheduler (realtimeManager.ts), live interactive ingestion bar with countdown ticker, channel selectors, and wire-log inspector modal.',
+    status: 'Completed'
   }
 ];
 

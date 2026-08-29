@@ -11,7 +11,7 @@ import {
   Cpu, 
   Share2, 
   Bookmark, 
-  BookmarkCheck,
+  BookmarkCheck, 
   Sparkles,
   ArrowRight
 } from 'lucide-react';
@@ -34,35 +34,35 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
   if (!job) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#17202A]/70 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
       <div 
-        className="relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative bg-[#FBFBFA] w-full max-w-3xl rounded-3xl shadow-2xl border border-[#CCD2D8] overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-6 md:p-8 bg-gradient-to-b from-blue-50/70 to-white border-b border-slate-100 flex items-start justify-between gap-4">
+        <div className="p-6 md:p-8 bg-gradient-to-b from-[#E0EEF5]/70 to-[#FBFBFA] border-b border-[#CCD2D8]/60 flex items-start justify-between gap-4">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#2563EB]/10 text-[#2563EB] border border-blue-200">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#E0EEF5] text-[#245170] border border-[#94C4DC]">
                 Source: {job.source}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#FAF0D4] text-[#8A6714] border border-[#C59B27]/40 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#C59B27]" />
                 <span>{job.experienceDisplay} (Verified)</span>
               </span>
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            <h2 className="text-2xl md:text-3xl font-black text-[#2C3E50] tracking-tight leading-tight">
               {job.title}
             </h2>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 font-medium pt-1">
-              <span className="text-slate-900 font-bold flex items-center gap-1">
-                <Building2 className="w-4 h-4 text-slate-500" /> {job.company}
+            <div className="flex flex-wrap items-center gap-3 text-sm text-[#4A5D70] font-medium pt-1">
+              <span className="text-[#2C3E50] font-bold flex items-center gap-1">
+                <Building2 className="w-4 h-4 text-[#3A7CA5]" /> {job.company}
               </span>
-              <span className="text-slate-300">•</span>
+              <span className="text-[#CCD2D8]">•</span>
               <span className="flex items-center gap-1">
-                <MapPin className="w-4 h-4 text-slate-500" /> {job.location} ({job.remoteType})
+                <MapPin className="w-4 h-4 text-[#3A7CA5]" /> {job.location} ({job.remoteType})
               </span>
             </div>
           </div>
@@ -72,16 +72,16 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
             <button
               onClick={() => onToggleSave(job.id)}
               className={`p-2.5 rounded-2xl border transition-colors ${
-                isSaved ? 'bg-blue-50 border-blue-200 text-[#2563EB]' : 'border-slate-200 text-slate-400 hover:bg-slate-50'
+                isSaved ? 'bg-[#FAF0D4] border-[#C59B27] text-[#8A6714]' : 'border-[#CCD2D8] text-[#6E8193] hover:bg-[#F4F4F0]'
               }`}
               title={isSaved ? 'Saved' : 'Save'}
             >
-              {isSaved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
+              {isSaved ? <BookmarkCheck className="w-5 h-5 text-[#C59B27]" /> : <Bookmark className="w-5 h-5" />}
             </button>
 
             <button
               onClick={onClose}
-              className="p-2.5 rounded-2xl border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              className="p-2.5 rounded-2xl border border-[#CCD2D8] text-[#6E8193] hover:text-[#2C3E50] hover:bg-[#F4F4F0] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -91,56 +91,56 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
         {/* Modal Body with Scroll */}
         <div className="p-6 md:p-8 overflow-y-auto space-y-6">
           {/* Strict Verification Checklist Card */}
-          <div className="bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-5 space-y-3">
-            <div className="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <div className="bg-[#E0EEF5]/70 border border-[#94C4DC] rounded-2xl p-5 space-y-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#1C3E56] flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#3A7CA5]" />
               Automated Ingestion Quality Seal (ISO/IEC 25010 Standards)
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-950 bg-white/80 p-2.5 rounded-xl border border-emerald-100">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1C3E56] bg-white/90 p-2.5 rounded-xl border border-[#C0DDEB]">
+                <CheckCircle2 className="w-4 h-4 text-[#3A7CA5] shrink-0" />
                 <span>Experience Ceiling: ≤2 Years</span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-950 bg-white/80 p-2.5 rounded-xl border border-emerald-100">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1C3E56] bg-white/90 p-2.5 rounded-xl border border-[#C0DDEB]">
+                <CheckCircle2 className="w-4 h-4 text-[#3A7CA5] shrink-0" />
                 <span>Upfront Salary Disclosed</span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-950 bg-white/80 p-2.5 rounded-xl border border-emerald-100">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1C3E56] bg-white/90 p-2.5 rounded-xl border border-[#C0DDEB]">
+                <CheckCircle2 className="w-4 h-4 text-[#3A7CA5] shrink-0" />
                 <span>Origin Tagged: {job.source}</span>
               </div>
             </div>
           </div>
 
           {/* Salary Highlight */}
-          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-5 bg-[#F4F4F0] rounded-2xl border border-[#E0E0D5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Guaranteed Compensation</div>
-              <div className="text-2xl font-black text-slate-900 font-mono mt-0.5">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#6E8193]">Guaranteed Compensation</div>
+              <div className="text-2xl font-black text-[#2C3E50] font-mono mt-0.5">
                 ${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}{' '}
-                <span className="text-sm font-normal text-slate-500">USD / {job.salaryPeriod}</span>
+                <span className="text-sm font-normal text-[#6E8193]">USD / {job.salaryPeriod}</span>
               </div>
             </div>
-            <div className="text-xs text-slate-500 font-medium">
+            <div className="text-xs text-[#6E8193] font-medium">
               Verified without hidden equity traps or zero-base commission structures.
             </div>
           </div>
 
           {/* Description Section */}
           <div className="space-y-3">
-            <h4 className="text-base font-bold text-slate-900">Role Overview</h4>
-            <p className="text-slate-700 leading-relaxed text-sm md:text-base">
+            <h4 className="text-base font-bold text-[#2C3E50]">Role Overview</h4>
+            <p className="text-[#4A5D70] leading-relaxed text-sm md:text-base">
               {job.description}
             </p>
           </div>
 
           {/* Core Requirements */}
           <div className="space-y-3">
-            <h4 className="text-base font-bold text-slate-900">Verified Requirements</h4>
+            <h4 className="text-base font-bold text-[#2C3E50]">Verified Requirements</h4>
             <ul className="space-y-2">
               {job.requirements.map((req, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB] mt-2 shrink-0" />
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-[#4A5D70]">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#3A7CA5] mt-2 shrink-0" />
                   <span>{req}</span>
                 </li>
               ))}
@@ -149,12 +149,12 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
 
           {/* Recommended Simulator Banner */}
           {job.simulatorsRecommended && job.simulatorsRecommended.length > 0 && (
-            <div className="bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="bg-[#FAF0D4] border border-[#C59B27]/40 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-xs font-bold text-blue-700 uppercase">
-                  <Cpu className="w-4 h-4 text-emerald-600" /> Stand Out with a Verified Simulator Badge
+                <div className="flex items-center gap-2 text-xs font-bold text-[#8A6714] uppercase">
+                  <Cpu className="w-4 h-4 text-[#C59B27]" /> Stand Out with a Sanctuary Gold Simulator Badge
                 </div>
-                <div className="text-sm font-semibold text-slate-900">
+                <div className="text-sm font-semibold text-[#2C3E50]">
                   Prove your skills in our interactive sandbox before submitting your application.
                 </div>
               </div>
@@ -163,7 +163,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
                   onClose();
                   onLaunchSimulator(job.simulatorsRecommended![0]);
                 }}
-                className="px-4 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-bold text-xs shadow-xs flex items-center gap-2 whitespace-nowrap transition-all"
+                className="px-4 py-2.5 rounded-xl bg-[#C59B27] hover:bg-[#AA821C] text-white font-bold text-xs shadow-sanctuary-glow flex items-center gap-2 whitespace-nowrap transition-all"
               >
                 <span>Launch Challenge</span>
                 <ArrowRight className="w-4 h-4" />
@@ -173,12 +173,12 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
 
           {/* Technology Tags */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Tech Stack & Tags</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E8193]">Tech Stack & Tags</h4>
             <div className="flex flex-wrap gap-2">
               {job.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-800"
+                  className="px-3 py-1 rounded-xl text-xs font-semibold bg-[#F4F4F0] text-[#2C3E50] border border-[#CCD2D8]/60"
                 >
                   {tag}
                 </span>
@@ -188,15 +188,15 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-slate-500 text-center sm:text-left">
-            Direct-apply routing takes you directly to the original posting on <strong className="text-slate-700">{job.source}</strong>.
+        <div className="p-6 md:p-8 bg-[#F4F4F0] border-t border-[#CCD2D8] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-[#6E8193] text-center sm:text-left">
+            Direct-apply routing takes you directly to the original posting on <strong className="text-[#2C3E50]">{job.source}</strong>.
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-colors"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-[#CCD2D8] text-[#2C3E50] text-xs font-bold hover:bg-[#E5E8EB] transition-colors"
             >
               Close
             </button>
@@ -204,7 +204,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
               href={job.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold shadow-md transition-all"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#C59B27] hover:bg-[#AA821C] text-white text-xs font-bold shadow-sanctuary-glow transition-all"
             >
               <span>Apply on {job.source}</span>
               <ExternalLink className="w-4 h-4" />
@@ -215,3 +215,4 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
     </div>
   );
 };
+

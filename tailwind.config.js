@@ -7,76 +7,119 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Tabernacle Design System Color Tokens
-        tekhelet: {
-          DEFAULT: '#1D4ED8', // Structural Tekhelet Blue (Authority, Layout Frames)
-          50: '#EFF6FF',
-          100: '#DBEAFE',
-          200: '#BFDBFE',
-          300: '#93C5FD',
-          400: '#60A5FA',
-          500: '#3B82F6',
-          600: '#2563EB',
-          700: '#1D4ED8', // Primary Tekhelet
-          800: '#1E40AF',
-          900: '#1E3A8A',
-          950: '#172554',
-        },
-        argaman: {
-          DEFAULT: '#7C3AED', // Royal Argaman Purple (Majesty, Action Buttons, Focus)
-          50: '#F5F3FF',
-          100: '#EDE9FE',
-          200: '#DDD6FE',
-          300: '#C4B5FD',
-          400: '#A78BFA',
-          500: '#8B5CF6',
-          600: '#7C3AED', // Primary Argaman
-          700: '#6D28D9',
-          800: '#5B21B6',
-          900: '#4C1D95',
-          950: '#2E1065',
-        },
-        scarlet: {
-          DEFAULT: '#DC2626', // Vibrant Scarlet (Security Alerts, High-Priority Warnings)
-          50: '#FEF2F2',
-          100: '#FEE2E2',
-          200: '#FECACA',
-          300: '#FCA5A5',
-          400: '#F87171',
-          500: '#EF4444',
-          600: '#DC2626', // Primary Scarlet
-          700: '#B91C1C',
-          800: '#991B1B',
-          900: '#7F1D1D',
-          950: '#450A0A',
-        },
-        linen: {
-          DEFAULT: '#F8FAFC', // Fine Linen & Purity Canvas
+        // Tabernacle Reimagined Design System Color Tokens (juniorpatio.ai.studio)
+        // 1. Canvas / Background: Luminous Alabaster (#FBFBFA)
+        alabaster: {
+          DEFAULT: '#FBFBFA',
           50: '#FFFFFF',
-          100: '#F8FAFC',
-          200: '#F1F5F9',
-          300: '#E2E8F0',
-          400: '#CBD5E1',
-          500: '#94A3B8',
-          600: '#64748B',
-          700: '#475569',
-          800: '#334155',
-          900: '#1E293B',
-          950: '#0F172A',
+          100: '#FBFBFA',
+          200: '#F4F4F0',
+          300: '#ECECE5',
+          400: '#E0E0D5',
+          500: '#CFCFC2',
+          600: '#B0B0A0',
+          700: '#8A8A78',
+          800: '#5C5C4F',
+          900: '#33332B',
+        },
+        // 2. Primary Accent: Sanctuary Gold (#C59B27)
+        sanctuary: {
+          DEFAULT: '#C59B27',
+          50: '#FDF9EE',
+          100: '#FAF0D4',
+          200: '#F4E0A9',
+          300: '#ECCC78',
+          400: '#DDB647',
+          500: '#C59B27', // Primary Sanctuary Gold
+          600: '#AA821C',
+          700: '#8A6714',
+          800: '#694E0F',
+          900: '#4D380A',
+          950: '#2E2105',
+        },
+        // 3. Secondary / Structural Tone: Celestial Horizon Blue (#3A7CA5)
+        celestial: {
+          DEFAULT: '#3A7CA5',
+          50: '#F0F7FA',
+          100: '#E0EEF5',
+          200: '#C0DDEB',
+          300: '#94C4DC',
+          400: '#64A7CC',
+          500: '#3A7CA5', // Primary Celestial Horizon Blue
+          600: '#2E668B',
+          700: '#245170',
+          800: '#1C3E56',
+          900: '#152E40',
+          950: '#0C1B27',
+        },
+        // 4. Micro-Accent: Covenant Crimson (#C0392B)
+        crimson: {
+          DEFAULT: '#C0392B',
+          50: '#FDF2F1',
+          100: '#FBE4E2',
+          200: '#F6CAC5',
+          300: '#EFA49C',
+          400: '#E46E62',
+          500: '#C0392B', // Primary Covenant Crimson
+          600: '#A92E22',
+          700: '#8C241A',
+          800: '#6F1C14',
+          900: '#54140E',
+          950: '#360B07',
+        },
+        // 5. Typography / Text: Charcoal Slate (#2C3E50)
+        charcoal: {
+          DEFAULT: '#2C3E50',
+          50: '#F4F6F7',
+          100: '#E5E8EB',
+          200: '#CCD2D8',
+          300: '#A3AFB9',
+          400: '#6E8193',
+          500: '#4A5D70',
+          600: '#34495E',
+          700: '#2C3E50', // Primary Charcoal Slate
+          800: '#212F3D',
+          900: '#17202A',
+          950: '#0E141B',
+        },
+        // Backward-compatible alias tokens
+        tekhelet: {
+          DEFAULT: '#3A7CA5',
+          50: '#F0F7FA',
+          100: '#E0EEF5',
+          200: '#C0DDEB',
+          500: '#3A7CA5',
+          700: '#245170',
+          800: '#1C3E56',
+          900: '#152E40',
         },
         gold: {
-          DEFAULT: '#F59E0B', // Sacred Gold (Verified Skill Badges, Premium Accents)
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          200: '#FDE68A',
-          300: '#FCD34D',
-          400: '#FBBF24',
-          500: '#F59E0B', // Primary Sacred Gold
-          600: '#D97706',
-          700: '#B45309',
-          800: '#92400E',
-          900: '#78350F',
-          950: '#451A03',
+          DEFAULT: '#C59B27',
+          50: '#FDF9EE',
+          100: '#FAF0D4',
+          200: '#F4E0A9',
+          300: '#ECCC78',
+          400: '#DDB647',
+          500: '#C59B27',
+          600: '#AA821C',
+          700: '#8A6714',
+        },
+        scarlet: {
+          DEFAULT: '#C0392B',
+          50: '#FDF2F1',
+          100: '#FBE4E2',
+          200: '#F6CAC5',
+          500: '#C0392B',
+          600: '#A92E22',
+        },
+        linen: {
+          DEFAULT: '#FBFBFA',
+          50: '#FFFFFF',
+          100: '#FBFBFA',
+          200: '#F4F4F0',
+          300: '#ECECE5',
+          800: '#2C3E50',
+          900: '#17202A',
         },
       },
       fontFamily: {
@@ -84,9 +127,12 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        'tabernacle-gold': '0 0 15px rgba(245, 158, 11, 0.35)',
-        'tabernacle-argaman': '0 0 15px rgba(124, 58, 237, 0.35)',
-        'tabernacle-tekhelet': '0 4px 20px rgba(29, 78, 216, 0.25)',
+        'sanctuary-glow': '0 0 16px rgba(197, 155, 39, 0.35)',
+        'celestial-glow': '0 4px 20px rgba(58, 124, 165, 0.22)',
+        'crimson-subtle': '0 2px 10px rgba(192, 57, 43, 0.25)',
+        'tabernacle-gold': '0 0 16px rgba(197, 155, 39, 0.35)',
+        'tabernacle-argaman': '0 0 16px rgba(197, 155, 39, 0.35)',
+        'tabernacle-tekhelet': '0 4px 20px rgba(58, 124, 165, 0.22)',
       },
     },
   },

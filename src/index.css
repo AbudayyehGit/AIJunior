@@ -1,66 +1,115 @@
 @import "tailwindcss";
 
 @theme {
-  --color-tekhelet: #1D4ED8;
-  --color-tekhelet-50: #EFF6FF;
-  --color-tekhelet-100: #DBEAFE;
-  --color-tekhelet-200: #BFDBFE;
-  --color-tekhelet-600: #2563EB;
-  --color-tekhelet-700: #1D4ED8;
-  --color-tekhelet-800: #1E40AF;
-  --color-tekhelet-900: #1E3A8A;
+  /* 1. Canvas / Background: Luminous Alabaster (#FBFBFA) */
+  --color-alabaster: #FBFBFA;
+  --color-alabaster-50: #FFFFFF;
+  --color-alabaster-100: #FBFBFA;
+  --color-alabaster-200: #F4F4F0;
+  --color-alabaster-300: #ECECE5;
+  --color-alabaster-400: #E0E0D5;
+  --color-alabaster-500: #CFCFC2;
   
-  --color-argaman: #7C3AED;
-  --color-argaman-50: #F5F3FF;
-  --color-argaman-100: #EDE9FE;
-  --color-argaman-200: #DDD6FE;
-  --color-argaman-500: #8B5CF6;
-  --color-argaman-600: #7C3AED;
-  --color-argaman-700: #6D28D9;
-  --color-argaman-800: #5B21B6;
-  --color-argaman-900: #4C1D95;
+  /* 2. Primary Accent: Sanctuary Gold (#C59B27) */
+  --color-sanctuary: #C59B27;
+  --color-sanctuary-50: #FDF9EE;
+  --color-sanctuary-100: #FAF0D4;
+  --color-sanctuary-200: #F4E0A9;
+  --color-sanctuary-300: #ECCC78;
+  --color-sanctuary-400: #DDB647;
+  --color-sanctuary-500: #C59B27;
+  --color-sanctuary-600: #AA821C;
+  --color-sanctuary-700: #8A6714;
+  --color-sanctuary-800: #694E0F;
+  --color-sanctuary-900: #4D380A;
 
-  --color-scarlet: #DC2626;
-  --color-scarlet-50: #FEF2F2;
-  --color-scarlet-100: #FEE2E2;
-  --color-scarlet-200: #FECACA;
-  --color-scarlet-500: #EF4444;
-  --color-scarlet-600: #DC2626;
-  --color-scarlet-700: #B91C1C;
-  --color-scarlet-800: #991B1B;
+  /* 3. Secondary / Structural Tone: Celestial Horizon Blue (#3A7CA5) */
+  --color-celestial: #3A7CA5;
+  --color-celestial-50: #F0F7FA;
+  --color-celestial-100: #E0EEF5;
+  --color-celestial-200: #C0DDEB;
+  --color-celestial-300: #94C4DC;
+  --color-celestial-400: #64A7CC;
+  --color-celestial-500: #3A7CA5;
+  --color-celestial-600: #2E668B;
+  --color-celestial-700: #245170;
+  --color-celestial-800: #1C3E56;
+  --color-celestial-900: #152E40;
 
-  --color-linen: #F8FAFC;
+  /* 4. Micro-Accent: Covenant Crimson (#C0392B) */
+  --color-crimson: #C0392B;
+  --color-crimson-50: #FDF2F1;
+  --color-crimson-100: #FBE4E2;
+  --color-crimson-200: #F6CAC5;
+  --color-crimson-300: #EFA49C;
+  --color-crimson-400: #E46E62;
+  --color-crimson-500: #C0392B;
+  --color-crimson-600: #A92E22;
+  --color-crimson-700: #8C241A;
+  --color-crimson-800: #6F1C14;
+  --color-crimson-900: #54140E;
+
+  /* 5. Typography / Text: Charcoal Slate (#2C3E50) */
+  --color-charcoal: #2C3E50;
+  --color-charcoal-50: #F4F6F7;
+  --color-charcoal-100: #E5E8EB;
+  --color-charcoal-200: #CCD2D8;
+  --color-charcoal-300: #A3AFB9;
+  --color-charcoal-400: #6E8193;
+  --color-charcoal-500: #4A5D70;
+  --color-charcoal-600: #34495E;
+  --color-charcoal-700: #2C3E50;
+  --color-charcoal-800: #212F3D;
+  --color-charcoal-900: #17202A;
+
+  /* Aliases */
+  --color-tekhelet: #3A7CA5;
+  --color-tekhelet-50: #F0F7FA;
+  --color-tekhelet-100: #E0EEF5;
+  --color-tekhelet-200: #C0DDEB;
+  --color-tekhelet-500: #3A7CA5;
+  --color-tekhelet-700: #245170;
+
+  --color-gold: #C59B27;
+  --color-gold-50: #FDF9EE;
+  --color-gold-100: #FAF0D4;
+  --color-gold-200: #F4E0A9;
+  --color-gold-500: #C59B27;
+  --color-gold-600: #AA821C;
+
+  --color-scarlet: #C0392B;
+  --color-scarlet-50: #FDF2F1;
+  --color-scarlet-100: #FBE4E2;
+  --color-scarlet-500: #C0392B;
+
+  --color-linen: #FBFBFA;
   --color-linen-50: #FFFFFF;
-  --color-linen-100: #F8FAFC;
-  --color-linen-200: #F1F5F9;
-  --color-linen-300: #E2E8F0;
-  --color-linen-800: #334155;
-  --color-linen-900: #1E293B;
-
-  --color-gold: #F59E0B;
-  --color-gold-50: #FFFBEB;
-  --color-gold-100: #FEF3C7;
-  --color-gold-200: #FDE68A;
-  --color-gold-300: #FCD34D;
-  --color-gold-400: #FBBF24;
-  --color-gold-500: #F59E0B;
-  --color-gold-600: #D97706;
-  --color-gold-700: #B45309;
+  --color-linen-100: #FBFBFA;
+  --color-linen-200: #F4F4F0;
+  --color-linen-800: #2C3E50;
+  --color-linen-900: #17202A;
 }
 
 @layer base {
   :root {
-    --color-tekhelet: #1D4ED8;
-    --color-argaman: #7C3AED;
-    --color-scarlet: #DC2626;
-    --color-linen: #F8FAFC;
-    --color-gold: #F59E0B;
-    --color-canvas-bg: #F8FAFC;
+    --color-canvas-bg: #FBFBFA;
     --color-card-bg: #FFFFFF;
+    --color-text-primary: #2C3E50;
+    --color-accent-gold: #C59B27;
+    --color-accent-blue: #3A7CA5;
+    --color-accent-crimson: #C0392B;
+  }
+
+  body {
+    background-color: #FBFBFA;
+    color: #2C3E50;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Shimmer animation for verified gold badges */
+/* Shimmer animation for verified Sanctuary Gold badges */
 @keyframes shimmerGold {
   0% {
     background-position: -200% 0;
@@ -71,30 +120,31 @@
 }
 
 .gold-shimmer-badge {
-  background: linear-gradient(90deg, #F59E0B 0%, #FDE68A 50%, #F59E0B 100%);
+  background: linear-gradient(90deg, #C59B27 0%, #F4E0A9 50%, #C59B27 100%);
   background-size: 200% auto;
-  animation: shimmerGold 3s linear infinite;
+  animation: shimmerGold 3.5s linear infinite;
 }
 
 /* Smooth transition defaults and scrollbar styling */
 html {
   scroll-behavior: smooth;
+  background-color: #FBFBFA;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #F4F4F0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #CFCFC2;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #B0B0A0;
 }

@@ -60,10 +60,45 @@ export interface RawWellfoundJob {
   job_url: string;
 }
 
+export interface RawRemoteOKJob {
+  id: string;
+  slug: string;
+  epoch: number;
+  date: string;
+  company: string;
+  company_logo?: string;
+  position: string;
+  tags: string[];
+  description: string;
+  location: string;
+  salary_min?: number;
+  salary_max?: number;
+  url: string;
+  apply_url: string;
+}
+
+export interface RawHackerNewsJob {
+  id: string;
+  by: string;
+  time: number;
+  text_html: string;
+  title: string;
+  company: string;
+  salary_min?: number;
+  salary_max?: number;
+  experience_years?: number;
+  location: string;
+  remote: boolean;
+  apply_url: string;
+  skills: string[];
+}
+
 export type RawScrapedJobPayload =
   | { source: 'LinkedIn'; data: RawLinkedInJob }
   | { source: 'Indeed'; data: RawIndeedJob }
-  | { source: 'Wellfound'; data: RawWellfoundJob };
+  | { source: 'Wellfound'; data: RawWellfoundJob }
+  | { source: 'RemoteOK'; data: RawRemoteOKJob }
+  | { source: 'HackerNews'; data: RawHackerNewsJob };
 
 export interface FilterViolation {
   rule: 'EXPERIENCE_CEILING_EXCEEDED' | 'COMPENSATION_MISSING_OR_NULL' | 'TITLE_SENIORITY_FLAG' | 'LOW_DATA_QUALITY';

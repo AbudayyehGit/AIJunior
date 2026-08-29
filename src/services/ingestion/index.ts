@@ -3,6 +3,8 @@ import { IngestionSyncReport, ScraperTelemetry } from './types';
 import { linkedInConnector } from './scrapers/linkedin';
 import { indeedConnector } from './scrapers/indeed';
 import { wellfoundConnector } from './scrapers/wellfound';
+import { remoteOKConnector } from './scrapers/remoteok';
+import { hackerNewsConnector } from './scrapers/hackernews';
 import { IngestionNormalizer } from './normalizer';
 import { IngestionValidator } from './validator';
 
@@ -17,12 +19,14 @@ export interface RunPipelineOptions {
  */
 export async function runIngestionPipeline(options?: RunPipelineOptions): Promise<IngestionSyncReport> {
   const startTime = Date.now();
-  const sourcesToScrape: JobSource[] = options?.sources || ['LinkedIn', 'Indeed', 'Wellfound'];
+  const sourcesToScrape: JobSource[] = options?.sources || ['LinkedIn', 'Indeed', 'Wellfound', 'RemoteOK', 'HackerNews'];
   
   const telemetryMap: Record<JobSource, ScraperTelemetry> = {
     LinkedIn: { source: 'LinkedIn', fetchDurationMs: 0, rawFetchedCount: 0, networkRetries: 0, proxyRotations: 0, rateLimitHits: 0, status: 'SUCCESS' },
     Indeed: { source: 'Indeed', fetchDurationMs: 0, rawFetchedCount: 0, networkRetries: 0, proxyRotations: 0, rateLimitHits: 0, status: 'SUCCESS' },
     Wellfound: { source: 'Wellfound', fetchDurationMs: 0, rawFetchedCount: 0, networkRetries: 0, proxyRotations: 0, rateLimitHits: 0, status: 'SUCCESS' },
+    RemoteOK: { source: 'RemoteOK', fetchDurationMs: 0, rawFetchedCount: 0, networkRetries: 0, proxyRotations: 0, rateLimitHits: 0, status: 'SUCCESS' },
+    HackerNews: { source: 'HackerNews', fetchDurationMs: 0, rawFetchedCount: 0, networkRetries: 0, proxyRotations: 0, rateLimitHits: 0, status: 'SUCCESS' },
     Direct: { source: 'Direct', fetchDurationMs: 0, rawFetchedCount: 0, networkRetries: 0, proxyRotations: 0, rateLimitHits: 0, status: 'SUCCESS' }
   };
 
@@ -58,6 +62,26 @@ export async function runIngestionPipeline(options?: RunPipelineOptions): Promis
         telemetryMap.Wellfound = res.telemetry;
         totalRawHarvested += res.jobs.length;
         res.jobs.forEach((raw) => rawJobs.push(IngestionNormalizer.normalizeWellfound(raw)));
+      })
+    );
+  }
+
+  if (sourcesToScrape.includes('RemoteOK')) {
+    fetchTasks.push(
+      remoteOKConnector.fetchRawListings().then((res) => {
+        telemetryMap.RemoteOK = res.telemetry;
+        totalRawHarvested += res.jobs.length;
+        res.jobs.forEach((raw) => rawJobs.push(IngestionNormalizer.normalizeRemoteOK(raw)));
+      })
+    );
+  }
+
+  if (sourcesToScrape.includes('HackerNews')) {
+    fetchTasks.push(
+      hackerNewsConnector.fetchRawListings().then((res) => {
+        telemetryMap.HackerNews = res.telemetry;
+        totalRawHarvested += res.jobs.length;
+        res.jobs.forEach((raw) => rawJobs.push(IngestionNormalizer.normalizeHackerNews(raw)));
       })
     );
   }
@@ -117,3 +141,6 @@ export * from './normalizer';
 export * from './scrapers/linkedin';
 export * from './scrapers/indeed';
 export * from './scrapers/wellfound';
+export * from './scrapers/remoteok';
+export * from './scrapers/hackernews';
+

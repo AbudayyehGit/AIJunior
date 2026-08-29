@@ -40,7 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   userName = 'Alex Vance'
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-[#1D4ED8] text-white border-b border-blue-800 shrink-0 shadow-md">
+    <header className="sticky top-0 z-40 bg-[#3A7CA5] text-white border-b border-[#245170] shrink-0 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Identity with 45-Degree Left-Angled Tabernacle Rocket Logo */}
@@ -49,11 +49,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('jobs')}
             className="flex items-center gap-3 text-left focus:outline-none rounded-lg group"
           >
-            <RocketLogo size={24} variant="tekhelet" />
+            <RocketLogo size={24} variant="celestial" />
           </button>
 
-          {/* Center: 3-Way Role Switcher Pill Bar with Royal Argaman Purple Active States */}
-          <div className="hidden sm:flex items-center bg-blue-900/70 p-1 rounded-full border border-blue-700/60 shadow-inner">
+          {/* Center: 3-Way Role Switcher Pill Bar with Sanctuary Gold Active States */}
+          <div className="hidden sm:flex items-center bg-[#1C3E56]/80 p-1 rounded-full border border-[#64A7CC]/40 shadow-inner">
             <button
               id="role-toggle-seeker"
               onClick={() => {
@@ -62,8 +62,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
                 userRole === 'job_seeker'
-                  ? 'bg-[#8B5CF6] text-white shadow-sm'
-                  : 'text-blue-100 hover:text-white hover:bg-blue-800/50'
+                  ? 'bg-[#C59B27] text-white shadow-xs'
+                  : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
               }`}
             >
               Job Seeker
@@ -76,8 +76,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
                 userRole === 'recruiter'
-                  ? 'bg-[#8B5CF6] text-white shadow-sm'
-                  : 'text-blue-100 hover:text-white hover:bg-blue-800/50'
+                  ? 'bg-[#C59B27] text-white shadow-xs'
+                  : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
               }`}
             >
               Recruiter
@@ -90,11 +90,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 ${
                 userRole === 'admin'
-                  ? 'bg-slate-900 text-amber-300 border border-amber-500/40 shadow-xs'
-                  : 'text-blue-100 hover:text-white hover:bg-blue-800/50'
+                  ? 'bg-[#2C3E50] text-[#F4E0A9] border border-[#C59B27]/50 shadow-xs'
+                  : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
               }`}
             >
-              <Lock className="w-3 h-3 text-amber-400" />
+              <Lock className="w-3 h-3 text-[#C59B27]" />
               <span>Admin</span>
             </button>
           </div>
@@ -104,53 +104,53 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* User Avatar Chip */}
             <div 
               onClick={openSettings}
-              className="flex items-center gap-2 cursor-pointer group bg-blue-900/60 hover:bg-blue-900/90 px-3 py-1.5 rounded-full border border-blue-700/50 transition-colors"
+              className="flex items-center gap-2 cursor-pointer group bg-[#1C3E56]/70 hover:bg-[#1C3E56]/95 px-3 py-1.5 rounded-full border border-[#64A7CC]/40 transition-colors"
               title="Click to customize profile & preferences"
             >
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 transition-all shadow-xs ${
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ring-2 transition-all shadow-xs ${
                 userRole === 'admin' 
-                  ? 'bg-slate-900 ring-amber-400 text-amber-300' 
+                  ? 'bg-[#2C3E50] ring-[#C59B27] text-[#F4E0A9]' 
                   : userRole === 'recruiter'
-                  ? 'bg-[#8B5CF6] ring-purple-300'
-                  : 'bg-amber-500 ring-amber-200 text-slate-950 font-black'
+                  ? 'bg-[#2E668B] ring-[#94C4DC] text-white'
+                  : 'bg-[#C59B27] ring-[#FAF0D4] text-white font-black'
               }`}>
                 {userRole === 'admin' ? 'ADM' : userRole === 'recruiter' ? 'REC' : 'AV'}
               </div>
-              <span className="text-xs font-bold text-white hidden md:inline group-hover:text-amber-200 transition-colors">
+              <span className="text-xs font-bold text-white hidden md:inline group-hover:text-[#F4E0A9] transition-colors">
                 {userRole === 'admin' ? 'Superadmin' : userRole === 'recruiter' ? 'Sarah Jenkins' : userName}
               </span>
             </div>
 
-            {/* Settings Icon Button */}
+            {/* Settings Icon Button with Covenant Crimson micro-badge */}
             <button
               id="open-settings-btn"
               onClick={openSettings}
-              className="p-2 hover:bg-blue-800 rounded-full text-blue-200 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 relative"
+              className="p-2 hover:bg-[#2E668B] rounded-full text-[#E0EEF5] hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#C59B27] relative"
               title="Personalized Settings"
             >
               <Settings className="w-5 h-5" />
               {earnedBadgesCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-amber-400 rounded-full ring-2 ring-blue-700 shadow-tabernacle-gold" />
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#C0392B] rounded-full ring-2 ring-[#3A7CA5] shadow-crimson-subtle" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Secondary Navigation Tabs with Tabernacle Palette */}
-        <div className="flex items-center space-x-2 py-2 border-t border-blue-700/70 overflow-x-auto scrollbar-none text-xs font-semibold">
+        {/* Secondary Navigation Tabs with Luminous Tabernacle Palette */}
+        <div className="flex items-center space-x-2 py-2 border-t border-[#245170]/80 overflow-x-auto scrollbar-none text-xs font-semibold">
           <button
             id="nav-tab-jobs"
             onClick={() => setActiveTab('jobs')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'jobs'
-                ? 'bg-white text-[#1D4ED8] font-black shadow-sm'
-                : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
           >
-            <Briefcase className={`w-3.5 h-3.5 ${activeTab === 'jobs' ? 'text-[#1D4ED8]' : 'text-blue-300'}`} />
+            <Briefcase className={`w-3.5 h-3.5 ${activeTab === 'jobs' ? 'text-[#3A7CA5]' : 'text-[#C0DDEB]'}`} />
             <span>Curated Feed</span>
             {savedJobsCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold bg-amber-100 text-amber-900 rounded-full">
+              <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold bg-[#FAF0D4] text-[#8A6714] rounded-full">
                 {savedJobsCount}
               </span>
             )}
@@ -161,14 +161,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('simulators')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'simulators'
-                ? 'bg-white text-[#1D4ED8] font-black shadow-sm'
-                : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
           >
-            <Cpu className={`w-3.5 h-3.5 ${activeTab === 'simulators' ? 'text-[#7C3AED]' : 'text-purple-300'}`} />
+            <Cpu className={`w-3.5 h-3.5 ${activeTab === 'simulators' ? 'text-[#C59B27]' : 'text-[#F4E0A9]'}`} />
             <span>Skill Simulators</span>
             {earnedBadgesCount > 0 && (
-              <span className="ml-1 flex items-center gap-1 px-1.5 py-0.2 text-[10px] font-bold bg-amber-400 text-slate-950 rounded-full shadow-tabernacle-gold">
+              <span className="ml-1 flex items-center gap-1 px-1.5 py-0.2 text-[10px] font-bold bg-[#C59B27] text-white rounded-full shadow-sanctuary-glow">
                 <Award className="w-3 h-3" />
                 {earnedBadgesCount}
               </span>
@@ -181,11 +181,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('seeker_portal')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'seeker_portal'
-                ? 'bg-white text-[#1D4ED8] font-black shadow-sm'
-                : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
           >
-            <UserCheck className={`w-3.5 h-3.5 ${activeTab === 'seeker_portal' ? 'text-[#1D4ED8]' : 'text-blue-300'}`} />
+            <UserCheck className={`w-3.5 h-3.5 ${activeTab === 'seeker_portal' ? 'text-[#3A7CA5]' : 'text-[#C0DDEB]'}`} />
             <span>Candidate Portal</span>
           </button>
 
@@ -195,11 +195,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('recruiter_portal')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'recruiter_portal'
-                ? 'bg-white text-[#1D4ED8] font-black shadow-sm'
-                : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
           >
-            <Users className={`w-3.5 h-3.5 ${activeTab === 'recruiter_portal' ? 'text-[#7C3AED]' : 'text-purple-300'}`} />
+            <Users className={`w-3.5 h-3.5 ${activeTab === 'recruiter_portal' ? 'text-[#3A7CA5]' : 'text-[#C0DDEB]'}`} />
             <span>Recruiter Portal</span>
           </button>
 
@@ -209,11 +209,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('admin')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'admin'
-                ? 'bg-slate-950 text-amber-300 font-black border border-amber-500/40 shadow-sm'
-                : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#2C3E50] text-[#F4E0A9] font-black border border-[#C59B27]/50 shadow-xs'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
           >
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <Lock className="w-3.5 h-3.5 text-[#C59B27]" />
             <span>Admin Backend</span>
           </button>
 
@@ -222,14 +222,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('ingestion')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'ingestion'
-                ? 'bg-white text-[#1D4ED8] font-black shadow-sm'
-                : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
             title="Live multi-source ingestion and validation telemetry"
           >
-            <Activity className={`w-3.5 h-3.5 ${activeTab === 'ingestion' ? 'text-[#1D4ED8]' : 'text-blue-300'}`} />
+            <Activity className={`w-3.5 h-3.5 ${activeTab === 'ingestion' ? 'text-[#3A7CA5]' : 'text-[#C0DDEB]'}`} />
             <span>Telemetry</span>
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#C59B27] animate-pulse" />
           </button>
 
           <button
@@ -237,16 +237,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('buildlog')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'buildlog'
-                ? 'bg-white text-[#1D4ED8] font-black shadow-sm'
-                : 'text-blue-200 hover:text-white hover:bg-blue-800/60'
+                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
+                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
             }`}
           >
-            <FileCode className="w-3.5 h-3.5 text-amber-300" />
-            <span className="font-mono">v0.9.1 Specs</span>
+            <FileCode className="w-3.5 h-3.5 text-[#F4E0A9]" />
+            <span className="font-mono">v1.0.0 Specs</span>
           </button>
         </div>
       </div>
     </header>
   );
 };
+
 

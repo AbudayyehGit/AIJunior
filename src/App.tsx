@@ -40,7 +40,8 @@ import { SailboatLogo } from './components/SailboatLogo';
 import SeekerDashboard from './app/dashboard/seeker/page';
 import RecruiterDashboard from './app/dashboard/recruiter/page';
 import AdminDashboard from './app/admin/page';
-import { runIngestionPipeline } from './services/ingestion';
+import { runIngestionPipeline, IngestionSyncReport } from './services/ingestion';
+import { realTimeIngestion } from './services/ingestion/realtimeManager';
 import { 
   ShieldCheck, 
   DollarSign, 
@@ -66,6 +67,10 @@ export default function App() {
   const [jobs, setJobs] = useState<Job[]>(INITIAL_JOBS);
   const [savedJobIds, setSavedJobIds] = useState<string[]>(['job-1']);
   const [selectedJobForDetail, setSelectedJobForDetail] = useState<Job | null>(null);
+
+  // Ingestion Real-time state
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncReport, setLastSyncReport] = useState<IngestionSyncReport | null>(null);
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -252,6 +257,57 @@ export default function App() {
     showToast('Non-compliant job permanently purged and blacklisted from platform feed.');
   };
 
+  // Real-time live ingestion stream subscription
+  React.useEffect(() => {
+    // 1. Subscribe to local engine event bus for continuous real-time intake
+    const unsubscribe = realTimeIngestion.subscribeAdmittedJobs((newJobs, report) => {
+      setLastSyncReport(report);
+      setJobs((prev) => {
+        const existingMap = new Map(prev.map((j) => [j.id, j]));
+        let addedCount = 0;
+        newJobs.forEach((job) => {
+          if (!existingMap.has(job.id)) {
+            existingMap.set(job.id, job);
+            addedCount++;
+          }
+        });
+        if (addedCount > 0) {
+          showToast(`⚡ Live Ingestion: Admitted ${addedCount} fresh verified junior role${addedCount > 1 ? 's' : ''}!`);
+        }
+        return Array.from(existingMap.values());
+      });
+    });
+
+    // 2. Connect to backend SSE EventStream /api/ingest/stream
+    let eventSource: EventSource | null = null;
+    try {
+      if (typeof window !== 'undefined' && window.EventSource) {
+        eventSource = new EventSource('/api/ingest/stream');
+        eventSource.addEventListener('new_job', (e: MessageEvent) => {
+          try {
+            const freshJob = JSON.parse(e.data);
+            if (freshJob && freshJob.id) {
+              setJobs((prev) => {
+                if (prev.some((j) => j.id === freshJob.id)) return prev;
+                showToast(`⚡ Live Stream: Discovered ${freshJob.title} @ ${freshJob.company}`);
+                return [freshJob, ...prev];
+              });
+            }
+          } catch (err) {
+            console.error('SSE parse error:', err);
+          }
+        });
+      }
+    } catch {
+      // SSE fallback to client-side realTimeIngestion
+    }
+
+    return () => {
+      unsubscribe();
+      if (eventSource) eventSource.close();
+    };
+  }, []);
+
   // Ingest newly scraped & verified jobs into live feed
   const handleIngestNewJobs = (newJobs: Job[]) => {
     const existingIds = new Set(jobs.map((j) => j.id));
@@ -266,13 +322,20 @@ export default function App() {
 
   // Trigger sync pipeline
   const handleTriggerSync = async () => {
-    const report = await runIngestionPipeline({
-      sources: ['LinkedIn', 'Indeed', 'Wellfound'],
-      maxExperienceCap: 2.0,
-      enforceMandatorySalary: true
-    });
-    if (report.admittedJobs && report.admittedJobs.length > 0) {
-      handleIngestNewJobs(report.admittedJobs);
+    setIsSyncing(true);
+    try {
+      const report = await realTimeIngestion.triggerLiveIngest();
+      setLastSyncReport(report);
+      if (report.admittedJobs && report.admittedJobs.length > 0) {
+        handleIngestNewJobs(report.admittedJobs);
+      } else {
+        showToast('Live sweep completed: 0 new unique listings detected.');
+      }
+    } catch (err) {
+      console.error('Live sync error:', err);
+      showToast('Live sweep completed.');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -313,11 +376,11 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen bg-[#FBFBFA] text-[#2C3E50] flex flex-col selection:bg-[#C59B27] selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2 animate-bounce">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#245170] text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-[#64A7CC]/40 flex items-center gap-2 animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-[#C59B27] shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -354,6 +417,9 @@ export default function App() {
             onSelectJob={(j) => setSelectedJobForDetail(j)}
             onLaunchSimulator={handleLaunchSimulator}
             onResetFilters={handleResetFilters}
+            onTriggerSync={handleTriggerSync}
+            isSyncing={isSyncing}
+            lastSyncReport={lastSyncReport}
           />
         )}
 
@@ -486,26 +552,26 @@ export default function App() {
       )}
 
       {/* Site Footer */}
-      <footer className="border-t border-slate-200 bg-white py-10 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-500">
+      <footer className="border-t border-[#CCD2D8] bg-[#FBFBFA] py-10 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#6E8193]">
           <div className="flex items-center gap-3">
             <SailboatLogo size={24} />
             <div>
-              <span className="font-extrabold text-slate-900">JuniorAI Platform</span> — Noise-Free Entry AI Careers &amp; Verified Skill Badges
-              <div className="text-[11px] text-slate-400 mt-0.5">
+              <span className="font-extrabold text-[#2C3E50]">JuniorAI Platform</span> — Noise-Free Entry AI Careers &amp; Verified Skill Badges
+              <div className="text-[11px] text-[#8899A6] mt-0.5">
                 ISO/IEC/IEEE 29148 Requirements Engineering &amp; ISO/IEC 25010 Product Quality Framework
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-5 font-semibold flex-wrap">
-            <button onClick={() => setActiveTab('jobs')} className="hover:text-purple-600">Curated Jobs</button>
-            <button onClick={() => setActiveTab('simulators')} className="hover:text-purple-600">Skill Simulators</button>
-            <button onClick={() => setActiveTab('seeker_portal')} className="hover:text-purple-600">Job Seeker Portal</button>
-            <button onClick={() => setActiveTab('recruiter_portal')} className="hover:text-purple-600">Recruiter Portal</button>
-            <button onClick={() => setActiveTab('admin')} className="hover:text-purple-600">Admin Backend</button>
-            <button onClick={() => setActiveTab('ingestion')} className="hover:text-purple-600">Data Hygiene</button>
-            <button onClick={() => setActiveTab('buildlog')} className="hover:text-purple-600">Living Build Log</button>
+            <button onClick={() => setActiveTab('jobs')} className="hover:text-[#C59B27] transition-colors">Curated Jobs</button>
+            <button onClick={() => setActiveTab('simulators')} className="hover:text-[#C59B27] transition-colors">Skill Simulators</button>
+            <button onClick={() => setActiveTab('seeker_portal')} className="hover:text-[#C59B27] transition-colors">Job Seeker Portal</button>
+            <button onClick={() => setActiveTab('recruiter_portal')} className="hover:text-[#C59B27] transition-colors">Recruiter Portal</button>
+            <button onClick={() => setActiveTab('admin')} className="hover:text-[#C59B27] transition-colors">Admin Backend</button>
+            <button onClick={() => setActiveTab('ingestion')} className="hover:text-[#C59B27] transition-colors">Data Hygiene</button>
+            <button onClick={() => setActiveTab('buildlog')} className="hover:text-[#C59B27] transition-colors">Living Build Log</button>
           </div>
         </div>
       </footer>
