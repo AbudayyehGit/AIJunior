@@ -27,7 +27,8 @@ import {
   Sparkles,
   ChevronRight,
   Copy,
-  Check
+  Check,
+  LogOut
 } from 'lucide-react';
 import { runIngestionPipeline } from '../../services/ingestion';
 
@@ -41,6 +42,7 @@ interface AdminDashboardProps {
   onQuarantineFlag?: (flagId: string) => void;
   onPurgeJob?: (flagId: string, jobId: string) => void;
   onTriggerSync?: () => Promise<void>;
+  onLogout?: () => void;
 }
 
 export default function AdminDashboard({
@@ -52,7 +54,8 @@ export default function AdminDashboard({
   onApproveFlag = () => {},
   onQuarantineFlag = () => {},
   onPurgeJob = () => {},
-  onTriggerSync
+  onTriggerSync,
+  onLogout
 }: AdminDashboardProps) {
   const [adminTab, setAdminTab] = useState<'ingestion' | 'moderation' | 'users' | 'security' | 'attestations'>('ingestion');
   const [isSyncing, setIsSyncing] = useState(false);
@@ -133,36 +136,48 @@ export default function AdminDashboard({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
       {/* Admin Header Banner */}
-      <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-md border border-slate-800">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-800">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
-              <Lock className="w-7 h-7" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+              <Lock className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-white">Administrator Backend Console</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold text-white">Administrator Backend Console</h1>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   SUPERADMIN RBAC
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                Zero-Trust Governance • Automated Multi-Source Ingestion Pipeline • Moderation & Audit Ledger
+                Zero-Trust Governance • Automated Multi-Source Ingestion Pipeline • Moderation &amp; Audit Ledger
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center flex-wrap gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
             <button
               onClick={handleTriggerSyncInternal}
               disabled={isSyncing}
-              className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-xs"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer whitespace-nowrap"
             >
               <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-              {isSyncing ? 'Syncing Workers...' : 'Force Ingestion Pipeline'}
+              <span>{isSyncing ? 'Syncing Workers...' : 'Force Ingestion Pipeline'}</span>
             </button>
+
+            {onLogout && (
+              <button
+                id="admin-logout-btn"
+                onClick={onLogout}
+                className="flex items-center gap-1.5 px-3.5 py-2.5 bg-rose-900/50 hover:bg-rose-800 text-rose-200 border border-rose-700/60 text-xs font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-xs shrink-0"
+                title="Log out of Superadmin session"
+              >
+                <LogOut className="w-4 h-4 text-rose-300" />
+                <span>Log out</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -338,27 +353,27 @@ export default function AdminDashboard({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
+                  <div className="flex items-center gap-2 w-full lg:w-auto justify-start lg:justify-end flex-wrap">
                     <button
                       onClick={() => onApproveFlag(flag.id)}
-                      className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5"
+                      className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       Approve Listing
                     </button>
                     <button
                       onClick={() => onQuarantineFlag(flag.id)}
-                      className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5"
+                      className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                     >
                       <Slash className="w-3.5 h-3.5" />
                       Quarantine
                     </button>
                     <button
                       onClick={() => onPurgeJob(flag.id, flag.jobId)}
-                      className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
+                      className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      Purge & Blacklist
+                      Purge &amp; Blacklist
                     </button>
                   </div>
                 </div>

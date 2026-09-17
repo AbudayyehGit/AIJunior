@@ -36,6 +36,7 @@ import { RecruiterView } from './components/RecruiterView';
 import { IngestionMonitor } from './components/IngestionMonitor';
 import { BuildLogView } from './components/BuildLogView';
 import { SettingsModal } from './components/SettingsModal';
+import { AuthModal } from './components/AuthModal';
 import { SailboatLogo } from './components/SailboatLogo';
 import SeekerDashboard from './app/dashboard/seeker/page';
 import RecruiterDashboard from './app/dashboard/recruiter/page';
@@ -62,6 +63,8 @@ export default function App() {
   // Navigation & Role State
   const [activeTab, setActiveTab] = useState<NavTabType>('jobs');
   const [userRole, setUserRole] = useState<UserRole>('job_seeker');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
   // Job Data State
   const [jobs, setJobs] = useState<Job[]>(INITIAL_JOBS);
@@ -375,6 +378,26 @@ export default function App() {
     return matchesSearch && matchesSource && matchesExp && matchesSalary && matchesRemote;
   });
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    showToast('Logged out of active session. Switched to guest mode.');
+  };
+
+  const handleLoginModalOpen = () => {
+    setIsAuthModalOpen(true);
+  };
+
+  const handleLoginAs = (role: UserRole) => {
+    setUserRole(role);
+    setIsLoggedIn(true);
+    setIsAuthModalOpen(false);
+    if (role === 'job_seeker') setActiveTab('seeker_portal');
+    else if (role === 'recruiter') setActiveTab('recruiter_portal');
+    else if (role === 'admin') setActiveTab('admin');
+    const roleName = role === 'admin' ? 'Superadmin' : role === 'recruiter' ? 'Sarah Jenkins' : 'Alex Vance';
+    showToast(`Signed in as ${roleName}`);
+  };
+
   return (
     <div className="min-h-screen bg-[#FBFBFA] text-[#2C3E50] flex flex-col selection:bg-[#C59B27] selection:text-white">
       {/* Toast Notification */}
@@ -394,6 +417,9 @@ export default function App() {
         earnedBadgesCount={earnedBadges.length}
         openSettings={() => setIsSettingsOpen(true)}
         savedJobsCount={savedJobIds.length}
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
+        onLogin={handleLoginModalOpen}
       />
 
       {/* Main Content Area */}
@@ -439,6 +465,9 @@ export default function App() {
             earnedBadges={earnedBadges}
             applications={applications}
             onUpdateStatus={handleUpdateApplicationStatus}
+            isLoggedIn={isLoggedIn}
+            onLogout={handleLogout}
+            onLogin={handleLoginModalOpen}
           />
         )}
 
@@ -450,6 +479,9 @@ export default function App() {
             onAddNewJob={handleAddNewJob}
             onBookmarkCandidate={handleBookmarkCandidate}
             savedCandidateIds={savedCandidateIds}
+            isLoggedIn={isLoggedIn}
+            onLogout={handleLogout}
+            onLogin={handleLoginModalOpen}
           />
         )}
 
@@ -465,6 +497,7 @@ export default function App() {
             onQuarantineFlag={handleQuarantineFlag}
             onPurgeJob={handlePurgeJob}
             onTriggerSync={handleTriggerSync}
+            onLogout={handleLogout}
           />
         )}
 
@@ -548,8 +581,17 @@ export default function App() {
             showToast('Preferences & profile synchronized!');
           }}
           earnedBadges={earnedBadges}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
         />
       )}
+
+      {/* Verified Role Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginAs={handleLoginAs}
+      />
 
       {/* Site Footer */}
       <footer className="border-t border-[#CCD2D8] bg-[#FBFBFA] py-10 mt-16">

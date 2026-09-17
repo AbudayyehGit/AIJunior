@@ -13,7 +13,9 @@ import {
   Lock,
   UserCheck,
   Layers,
-  Sparkles
+  Sparkles,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 
 export type NavTabType = 'jobs' | 'simulators' | 'candidates' | 'seeker_portal' | 'recruiter_portal' | 'admin' | 'ingestion' | 'buildlog';
@@ -27,6 +29,9 @@ interface NavbarProps {
   openSettings: () => void;
   savedJobsCount: number;
   userName?: string;
+  isLoggedIn?: boolean;
+  onLogout?: () => void;
+  onLogin?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,7 +42,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   earnedBadgesCount,
   openSettings,
   savedJobsCount,
-  userName = 'Alex Vance'
+  userName = 'Alex Vance',
+  isLoggedIn = true,
+  onLogout,
+  onLogin
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-[#3A7CA5] text-white border-b border-[#245170] shrink-0 shadow-md">
@@ -99,25 +107,27 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Right Action Controls: User Profile Chip + Settings */}
-          <div className="flex items-center gap-3 md:gap-5">
+          {/* Right Action Controls: User Profile Chip + Settings + Obvious Logout */}
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* User Avatar Chip */}
             <div 
               onClick={openSettings}
-              className="flex items-center gap-2 cursor-pointer group bg-[#1C3E56]/70 hover:bg-[#1C3E56]/95 px-3 py-1.5 rounded-full border border-[#64A7CC]/40 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group bg-[#1C3E56]/70 hover:bg-[#1C3E56]/95 px-2.5 sm:px-3 py-1.5 rounded-full border border-[#64A7CC]/40 transition-colors"
               title="Click to customize profile & preferences"
             >
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ring-2 transition-all shadow-xs ${
-                userRole === 'admin' 
+              <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black ring-2 transition-all shadow-xs ${
+                !isLoggedIn
+                  ? 'bg-slate-700 ring-slate-400 text-slate-200'
+                  : userRole === 'admin' 
                   ? 'bg-[#2C3E50] ring-[#C59B27] text-[#F4E0A9]' 
                   : userRole === 'recruiter'
                   ? 'bg-[#2E668B] ring-[#94C4DC] text-white'
                   : 'bg-[#C59B27] ring-[#FAF0D4] text-white font-black'
               }`}>
-                {userRole === 'admin' ? 'ADM' : userRole === 'recruiter' ? 'REC' : 'AV'}
+                {!isLoggedIn ? 'G' : userRole === 'admin' ? 'ADM' : userRole === 'recruiter' ? 'REC' : 'AV'}
               </div>
               <span className="text-xs font-bold text-white hidden md:inline group-hover:text-[#F4E0A9] transition-colors">
-                {userRole === 'admin' ? 'Superadmin' : userRole === 'recruiter' ? 'Sarah Jenkins' : userName}
+                {!isLoggedIn ? 'Guest' : userRole === 'admin' ? 'Superadmin' : userRole === 'recruiter' ? 'Sarah Jenkins' : userName}
               </span>
             </div>
 
@@ -125,14 +135,37 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="open-settings-btn"
               onClick={openSettings}
-              className="p-2 hover:bg-[#2E668B] rounded-full text-[#E0EEF5] hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#C59B27] relative"
+              className="p-1.5 sm:p-2 hover:bg-[#2E668B] rounded-full text-[#E0EEF5] hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#C59B27] relative shrink-0"
               title="Personalized Settings"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
               {earnedBadgesCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#C0392B] rounded-full ring-2 ring-[#3A7CA5] shadow-crimson-subtle" />
+                <span className="absolute top-1 right-1 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-[#C0392B] rounded-full ring-2 ring-[#3A7CA5] shadow-crimson-subtle" />
               )}
             </button>
+
+            {/* OBVIOUS HIGH-CONTRAST LOGOUT BUTTON */}
+            {isLoggedIn ? (
+              <button
+                id="nav-logout-btn"
+                onClick={onLogout}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C0392B] hover:bg-[#A93226] active:bg-[#922B21] text-white text-xs font-black rounded-full border border-rose-300/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-white shrink-0 hover:shadow-md cursor-pointer"
+                title="Log out of your current session"
+              >
+                <LogOut className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                <span className="inline">Log out</span>
+              </button>
+            ) : (
+              <button
+                id="nav-login-btn"
+                onClick={onLogin}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C59B27] hover:bg-[#AA821C] text-white text-xs font-black rounded-full border border-[#FAF0D4]/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-white shrink-0 cursor-pointer"
+                title="Sign in to your account"
+              >
+                <LogIn className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                <span className="inline">Sign in</span>
+              </button>
+            )}
           </div>
         </div>
 

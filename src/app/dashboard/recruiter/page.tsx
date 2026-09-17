@@ -19,7 +19,9 @@ import {
   Bookmark, 
   Sparkles,
   ChevronDown,
-  X
+  X,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 
 interface RecruiterDashboardProps {
@@ -28,6 +30,9 @@ interface RecruiterDashboardProps {
   onAddNewJob?: (job: Job) => void;
   onBookmarkCandidate?: (candidateId: string) => void;
   savedCandidateIds?: string[];
+  isLoggedIn?: boolean;
+  onLogout?: () => void;
+  onLogin?: () => void;
 }
 
 export default function RecruiterDashboard({
@@ -35,7 +40,10 @@ export default function RecruiterDashboard({
   jobs = [],
   onAddNewJob = () => {},
   onBookmarkCandidate = () => {},
-  savedCandidateIds = []
+  savedCandidateIds = [],
+  isLoggedIn = true,
+  onLogout,
+  onLogin
 }: RecruiterDashboardProps) {
   const [activeTab, setActiveTab] = useState<'candidates' | 'post_job' | 'active_jobs'>('candidates');
 
@@ -150,73 +158,95 @@ export default function RecruiterDashboard({
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
       {/* Top Header Card */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-md ring-4 ring-purple-100">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-md ring-4 ring-purple-100 shrink-0">
               REC
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-slate-900">Recruiter Talent Portal</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Recruiter Talent Portal</h1>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
                   <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
                   Verified Employer (NeuralFlow Labs)
                 </span>
               </div>
-              <p className="text-sm text-slate-600 mt-1">
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
                 Direct access to candidates with cryptographically attested AI badges and ISO entry-level guarantees.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center flex-wrap gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
             <button
               onClick={() => setActiveTab('post_job')}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-xl transition-all shadow-xs"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-xs cursor-pointer whitespace-nowrap"
             >
               <PlusCircle className="w-4 h-4" />
-              Post Entry-Level Role
+              <span>Post Entry-Level Role</span>
             </button>
+
+            {isLoggedIn && onLogout ? (
+              <button
+                id="recruiter-logout-btn"
+                onClick={onLogout}
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-[#C0392B] border border-rose-200 text-xs sm:text-sm font-bold rounded-xl transition-all shadow-xs cursor-pointer whitespace-nowrap shrink-0"
+                title="Log out of recruiter account"
+              >
+                <LogOut className="w-4 h-4 text-[#C0392B]" />
+                <span>Log out</span>
+              </button>
+            ) : onLogin ? (
+              <button
+                id="recruiter-login-btn"
+                onClick={onLogin}
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs sm:text-sm font-bold rounded-xl transition-all shadow-xs cursor-pointer whitespace-nowrap shrink-0"
+                title="Sign in to employer account"
+              >
+                <LogIn className="w-4 h-4 text-emerald-600" />
+                <span>Sign in</span>
+              </button>
+            ) : null}
           </div>
         </div>
 
         {/* Sub-Navigation Tabs */}
-        <div className="flex items-center gap-2 mt-6 pt-6 border-t border-slate-100 text-sm font-semibold">
+        <div className="flex items-center gap-2 mt-6 pt-6 border-t border-slate-100 text-xs sm:text-sm font-semibold overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab('candidates')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-2 ${
               activeTab === 'candidates'
                 ? 'bg-purple-50 text-purple-700 border border-purple-200'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
             <Users className="w-4 h-4 text-purple-600" />
-            Verified Talent Search ({candidates.length})
+            <span>Verified Talent Search ({candidates.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('post_job')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-2 ${
               activeTab === 'post_job'
                 ? 'bg-purple-50 text-purple-700 border border-purple-200'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
             <PlusCircle className="w-4 h-4 text-purple-600" />
-            Post Entry Role (Strict &le;2 Yrs)
+            <span>Post Entry Role (Strict &le;2 Yrs)</span>
           </button>
           <button
             onClick={() => setActiveTab('active_jobs')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-2 ${
               activeTab === 'active_jobs'
                 ? 'bg-purple-50 text-purple-700 border border-purple-200'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
             <Briefcase className="w-4 h-4 text-purple-600" />
-            Published Postings ({jobs.filter(j => j.source === 'Direct' || j.company.includes('NeuralFlow')).length})
+            <span>Published Postings ({jobs.filter(j => j.source === 'Direct' || j.company.includes('NeuralFlow')).length})</span>
           </button>
         </div>
       </div>

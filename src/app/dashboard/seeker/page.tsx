@@ -21,7 +21,9 @@ import {
   Bookmark,
   Share2,
   Copy,
-  Check
+  Check,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 
 interface SeekerDashboardProps {
@@ -29,13 +31,19 @@ interface SeekerDashboardProps {
   earnedBadges?: SkillBadge[];
   applications?: JobApplication[];
   onUpdateStatus?: (appId: string, newStatus: JobApplication['status']) => void;
+  isLoggedIn?: boolean;
+  onLogout?: () => void;
+  onLogin?: () => void;
 }
 
 export default function SeekerDashboard({
   onLaunchSimulator = () => {},
   earnedBadges = [],
   applications = [],
-  onUpdateStatus = () => {}
+  onUpdateStatus = () => {},
+  isLoggedIn = true,
+  onLogout,
+  onLogin
 }: SeekerDashboardProps) {
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'badges' | 'portfolio' | 'applications'>('overview');
   const [selectedBadgeProof, setSelectedBadgeProof] = useState<SkillBadge | null>(null);
@@ -96,92 +104,118 @@ export default function SeekerDashboard({
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
       {/* Top Banner / Header Card */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-md ring-4 ring-purple-100">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 w-full lg:w-auto">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-lg sm:text-xl font-bold shadow-md ring-4 ring-purple-100 shrink-0">
               AV
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-slate-900">Alex Vance</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Alex Vance</h1>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
                   <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
                   Verified Entry Candidate
                 </span>
               </div>
-              <p className="text-sm text-slate-600 mt-1">
-                Junior AI Systems & Prompt Engineer • 1 Year Exp • Target: $95,000 - $125,000 • Open to Remote & Hybrid
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                Junior AI Systems &amp; Prompt Engineer • 1 Year Exp • Target: $95,000 - $125,000 • Open to Remote &amp; Hybrid
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center flex-wrap gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
             <button
               onClick={() => onLaunchSimulator('sim-token-cost')}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-xl transition-all shadow-xs"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-xs whitespace-nowrap cursor-pointer"
             >
               <Zap className="w-4 h-4" />
-              Take New Simulator
+              <span>Take New Simulator</span>
             </button>
             <a
               href="https://github.com/alexvance-ai"
               target="_blank"
               rel="noreferrer"
-              className="p-2.5 text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl border border-slate-200 transition-colors"
+              className="p-2 sm:p-2.5 text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl border border-slate-200 transition-colors shrink-0"
               title="GitHub Profile"
             >
-              <Github className="w-5 h-5" />
+              <Github className="w-4 h-4 sm:w-5 sm:h-5" />
             </a>
+
+            {/* OBVIOUS LOGOUT BUTTON IN USER BACKEND */}
+            {isLoggedIn ? (
+              <button
+                id="seeker-header-logout-btn"
+                onClick={onLogout}
+                className="flex items-center gap-1.5 px-3.5 py-2 sm:py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 text-xs sm:text-sm font-bold rounded-xl transition-all shadow-2xs whitespace-nowrap cursor-pointer shrink-0"
+                title="Log out of your candidate account"
+              >
+                <LogOut className="w-4 h-4 text-rose-600" />
+                <span>Log out</span>
+              </button>
+            ) : (
+              <button
+                id="seeker-header-login-btn"
+                onClick={onLogin}
+                className="flex items-center gap-1.5 px-3.5 py-2 sm:py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-xs whitespace-nowrap cursor-pointer shrink-0"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign in</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Dashboard Sub-navigation Tabs */}
-        <div className="flex items-center gap-2 mt-6 pt-6 border-t border-slate-100 text-sm font-semibold">
+        {/* Dashboard Sub-navigation Tabs - Fixed Mobile Overflow */}
+        <div className="flex items-center gap-2 mt-6 pt-5 border-t border-slate-100 text-xs sm:text-sm font-semibold overflow-x-auto scrollbar-none pb-1.5 -mx-1 px-1 max-w-full">
           <button
+            id="seeker-tab-overview"
             onClick={() => setActiveSubTab('overview')}
-            className={`px-4 py-2 rounded-xl transition-all ${
+            className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap shrink-0 cursor-pointer ${
               activeSubTab === 'overview'
-                ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs font-bold'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
-            Overview & Stats
+            Overview &amp; Stats
           </button>
           <button
+            id="seeker-tab-badges"
             onClick={() => setActiveSubTab('badges')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeSubTab === 'badges'
-                ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs font-bold'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
             <Award className="w-4 h-4 text-purple-600" />
-            Attested Badges ({earnedBadges.length})
+            <span>Attested Badges ({earnedBadges.length})</span>
           </button>
           <button
+            id="seeker-tab-portfolio"
             onClick={() => setActiveSubTab('portfolio')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeSubTab === 'portfolio'
-                ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs font-bold'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
             <Github className="w-4 h-4 text-purple-600" />
-            Portfolio & Code Repos
+            <span>Portfolio &amp; Repos</span>
           </button>
           <button
+            id="seeker-tab-applications"
             onClick={() => setActiveSubTab('applications')}
-            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeSubTab === 'applications'
-                ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs font-bold'
                 : 'text-slate-600 hover:text-purple-600 hover:bg-slate-50'
             }`}
           >
             <Briefcase className="w-4 h-4 text-purple-600" />
-            Tracked Applications ({applications.length})
+            <span>Tracked Applications ({applications.length})</span>
           </button>
         </div>
       </div>
@@ -261,14 +295,14 @@ export default function SeekerDashboard({
                 {earnedBadges.map((badge) => (
                   <div
                     key={badge.id}
-                    className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex items-start justify-between gap-4"
+                    className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-xs">
+                      <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-xs shrink-0">
                         <Award className="w-5 h-5" />
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-sm font-bold text-slate-900">{badge.name}</h3>
                           <span className="px-2 py-0.5 text-[10px] font-bold bg-purple-100 text-purple-800 rounded-md">
                             {badge.category}
@@ -283,7 +317,7 @@ export default function SeekerDashboard({
 
                     <button
                       onClick={() => setSelectedBadgeProof(badge)}
-                      className="px-3 py-1.5 bg-white hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-semibold rounded-lg transition-colors shadow-2xs whitespace-nowrap"
+                      className="w-full sm:w-auto px-3.5 py-2 bg-white hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-semibold rounded-lg transition-colors shadow-2xs whitespace-nowrap text-center cursor-pointer shrink-0"
                     >
                       Audit Proof
                     </button>
@@ -311,10 +345,10 @@ export default function SeekerDashboard({
                 {applications.slice(0, 3).map((app) => (
                   <div
                     key={app.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between gap-4"
+                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
                   >
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="px-2 py-0.5 text-[10px] font-bold bg-white text-slate-700 border border-slate-200 rounded-md">
                           {app.source}
                         </span>
@@ -323,7 +357,7 @@ export default function SeekerDashboard({
                       <p className="text-xs text-slate-600 mt-1">{app.company} • {app.location}</p>
                     </div>
 
-                    <div className="text-right">
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60">
                       <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
                         app.status === 'Recruiter Screen'
                           ? 'bg-purple-100 text-purple-800 border border-purple-200'
@@ -333,7 +367,7 @@ export default function SeekerDashboard({
                       }`}>
                         {app.status}
                       </span>
-                      <p className="text-[11px] text-slate-500 mt-1">{app.salaryRange}</p>
+                      <p className="text-[11px] text-slate-500 sm:mt-1 font-semibold">{app.salaryRange}</p>
                     </div>
                   </div>
                 ))}
@@ -346,17 +380,17 @@ export default function SeekerDashboard({
       {/* BADGES SUB-TAB */}
       {activeSubTab === 'badges' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Cryptographically Attested Skill Badges</h2>
-                <p className="text-sm text-slate-600 mt-1">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">Cryptographically Attested Skill Badges</h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   Each badge is minted via assertion test suites, signed with an Ed25519 key, and anchored to an ISO compliance hash.
                 </p>
               </div>
               <button
                 onClick={() => onLaunchSimulator('sim-token-cost')}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-xl transition-all"
+                className="w-full sm:w-auto px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-xl transition-all whitespace-nowrap shrink-0 text-center cursor-pointer shadow-xs"
               >
                 + Earn Additional Badge
               </button>
@@ -396,13 +430,14 @@ export default function SeekerDashboard({
                   <div className="pt-4 mt-4 border-t border-slate-100 flex items-center gap-2">
                     <button
                       onClick={() => setSelectedBadgeProof(badge)}
-                      className="flex-1 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition-colors text-center"
+                      className="flex-1 py-2 px-2 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition-colors text-center truncate cursor-pointer"
+                      title="Audit Proof & Signatures"
                     >
-                      Audit Proof & Signatures
+                      Audit Proof &amp; Signatures
                     </button>
                     <button
                       onClick={() => handleCopy(badge.verificationCode, badge.id)}
-                      className="p-2 hover:bg-slate-100 text-slate-500 rounded-xl transition-colors"
+                      className="p-2 hover:bg-slate-100 text-slate-500 rounded-xl transition-colors shrink-0 cursor-pointer"
                       title="Copy Verification Code"
                     >
                       {copiedHash === badge.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -419,12 +454,12 @@ export default function SeekerDashboard({
       {activeSubTab === 'portfolio' && (
         <div className="space-y-6">
           {/* GitHub Repositories Grid */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <Github className="w-6 h-6 text-slate-900" />
+                <Github className="w-6 h-6 text-slate-900 shrink-0" />
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">Featured Open-Source AI Repositories</h2>
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900">Featured Open-Source AI Repositories</h2>
                   <p className="text-xs text-slate-500">Live projects showcasing token optimization, RAG, and guardrails</p>
                 </div>
               </div>
@@ -432,9 +467,9 @@ export default function SeekerDashboard({
                 href="https://github.com/alexvance-ai"
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                className="w-full sm:w-auto px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shrink-0 whitespace-nowrap cursor-pointer"
               >
-                GitHub Profile <ExternalLink className="w-3.5 h-3.5" />
+                <span>GitHub Profile</span> <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
 
@@ -476,12 +511,12 @@ export default function SeekerDashboard({
           </div>
 
           {/* Hugging Face Models & Spaces */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <Database className="w-6 h-6 text-yellow-500" />
+                <Database className="w-6 h-6 text-yellow-500 shrink-0" />
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">Hugging Face Models & Dataset Artifacts</h2>
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900">Hugging Face Models &amp; Dataset Artifacts</h2>
                   <p className="text-xs text-slate-500">Published checkpoints, evaluation datasets, and space demos</p>
                 </div>
               </div>
@@ -489,9 +524,9 @@ export default function SeekerDashboard({
                 href="https://huggingface.co/alexvance"
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors border border-yellow-200"
+                className="w-full sm:w-auto px-3.5 py-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-yellow-200 shrink-0 whitespace-nowrap cursor-pointer"
               >
-                Hugging Face Profile <ExternalLink className="w-3.5 h-3.5" />
+                <span>Hugging Face Profile</span> <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
 
@@ -520,22 +555,22 @@ export default function SeekerDashboard({
       {/* APPLICATIONS TRACKER SUB-TAB */}
       {activeSubTab === 'applications' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs space-y-4">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Tracked Multi-Source Applications</h2>
-                <p className="text-sm text-slate-600 mt-1">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">Tracked Multi-Source Applications</h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   Manage applications originating from LinkedIn, Indeed, Wellfound, or Direct Platform drops.
                 </p>
               </div>
 
-              {/* Status Filter Buttons */}
-              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+              {/* Status Filter Buttons - Fixed Mobile Overflow */}
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold overflow-x-auto scrollbar-none max-w-full w-full sm:w-auto">
                 {['ALL', 'Submitted', 'Under Review', 'Recruiter Screen', 'Challenge Passed'].map((st) => (
                   <button
                     key={st}
                     onClick={() => setAppFilter(st)}
-                    className={`px-3 py-1.5 rounded-lg transition-all ${
+                    className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                       appFilter === st
                         ? 'bg-white text-purple-700 shadow-2xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
@@ -552,10 +587,10 @@ export default function SeekerDashboard({
               {filteredApps.map((app) => (
                 <div
                   key={app.id}
-                  className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-purple-200 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs"
+                  className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-purple-200 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs"
                 >
                   <div className="space-y-1.5 max-w-xl">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wider ${
                         app.source === 'LinkedIn'
                           ? 'bg-blue-50 text-blue-700 border border-blue-200'
@@ -565,7 +600,7 @@ export default function SeekerDashboard({
                       }`}>
                         {app.source}
                       </span>
-                      <h3 className="text-base font-bold text-slate-900">{app.jobTitle}</h3>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900">{app.jobTitle}</h3>
                     </div>
                     <p className="text-xs text-slate-600">{app.company} • {app.location} • Applied on {app.appliedDate}</p>
                     {app.notes && (
@@ -575,10 +610,10 @@ export default function SeekerDashboard({
                     )}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto justify-between">
-                    <div className="text-left sm:text-right">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto justify-between pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                    <div className="flex sm:flex-col justify-between sm:justify-start items-center sm:items-end">
                       <div className="text-xs font-bold text-purple-700">{app.salaryRange}</div>
-                      <span className={`inline-block mt-1 px-3 py-1 text-xs font-bold rounded-full ${
+                      <span className={`inline-block sm:mt-1 px-2.5 py-0.5 sm:px-3 sm:py-1 text-xs font-bold rounded-full ${
                         app.status === 'Recruiter Screen'
                           ? 'bg-purple-100 text-purple-800 border border-purple-200'
                           : app.status === 'Challenge Passed'
@@ -589,11 +624,11 @@ export default function SeekerDashboard({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                       <select
                         value={app.status}
                         onChange={(e) => onUpdateStatus(app.id, e.target.value as any)}
-                        className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full sm:w-auto text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
                       >
                         <option value="Submitted">Submitted</option>
                         <option value="Under Review">Under Review</option>
@@ -665,20 +700,20 @@ export default function SeekerDashboard({
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`https://verify.platform.dev/proof/${selectedBadgeProof.verificationCode}`);
                   handleCopy(selectedBadgeProof.verificationCode, 'modal');
                 }}
-                className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                className="w-full sm:flex-1 py-2.5 px-4 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 {copiedHash === 'modal' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {copiedHash === 'modal' ? 'Copied Public Proof Link' : 'Copy Public Proof URL'}
+                <span>{copiedHash === 'modal' ? 'Copied Public Proof Link' : 'Copy Public Proof URL'}</span>
               </button>
               <button
                 onClick={() => setSelectedBadgeProof(null)}
-                className="py-2.5 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+                className="w-full sm:w-auto py-2.5 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer text-center"
               >
                 Close
               </button>

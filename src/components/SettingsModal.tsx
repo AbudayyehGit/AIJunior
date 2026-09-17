@@ -12,7 +12,8 @@ import {
   RefreshCw,
   Save,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  LogOut
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -20,6 +21,8 @@ interface SettingsModalProps {
   onClose: () => void;
   onSaveSettings: (newSettings: UserSettings) => void;
   earnedBadges: SkillBadge[];
+  isLoggedIn?: boolean;
+  onLogout?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -27,6 +30,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   onSaveSettings,
   earnedBadges,
+  isLoggedIn = true,
+  onLogout
 }) => {
   const [formData, setFormData] = useState<UserSettings>(settings);
   const [isSavedNotice, setIsSavedNotice] = useState(false);
@@ -252,6 +257,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="w-4 h-4 text-[#C59B27] rounded accent-[#C59B27]"
                   />
                 </label>
+              </div>
+            </div>
+
+            {/* Account & Session Management */}
+            <div className="space-y-3 pt-2">
+              <h3 className="text-xs font-bold text-[#8A6714] uppercase tracking-wider flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" /> Account &amp; Session
+              </h3>
+              <div className="p-4 bg-rose-50/70 rounded-2xl border border-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">Current Active Session</h4>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    {isLoggedIn ? 'Signed in with client persistence. You can terminate your session at any time.' : 'Currently browsing as a guest.'}
+                  </p>
+                </div>
+                {isLoggedIn && onLogout && (
+                  <button
+                    type="button"
+                    id="settings-logout-btn"
+                    onClick={() => {
+                      onLogout();
+                      onClose();
+                    }}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    <LogOut className="w-4 h-4 text-white" />
+                    <span>Log out of session</span>
+                  </button>
+                )}
               </div>
             </div>
 
