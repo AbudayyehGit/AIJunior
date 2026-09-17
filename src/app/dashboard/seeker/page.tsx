@@ -27,7 +27,6 @@ import {
 } from 'lucide-react';
 
 interface SeekerDashboardProps {
-  onLaunchSimulator?: (simId: string) => void;
   earnedBadges?: SkillBadge[];
   applications?: JobApplication[];
   onUpdateStatus?: (appId: string, newStatus: JobApplication['status']) => void;
@@ -37,7 +36,6 @@ interface SeekerDashboardProps {
 }
 
 export default function SeekerDashboard({
-  onLaunchSimulator = () => {},
   earnedBadges = [],
   applications = [],
   onUpdateStatus = () => {},
@@ -127,13 +125,6 @@ export default function SeekerDashboard({
           </div>
 
           <div className="flex items-center flex-wrap gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
-            <button
-              onClick={() => onLaunchSimulator('sim-token-cost')}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-xs whitespace-nowrap cursor-pointer"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Take New Simulator</span>
-            </button>
             <a
               href="https://github.com/alexvance-ai"
               target="_blank"
@@ -388,12 +379,6 @@ export default function SeekerDashboard({
                   Each badge is minted via assertion test suites, signed with an Ed25519 key, and anchored to an ISO compliance hash.
                 </p>
               </div>
-              <button
-                onClick={() => onLaunchSimulator('sim-token-cost')}
-                className="w-full sm:w-auto px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-xl transition-all whitespace-nowrap shrink-0 text-center cursor-pointer shadow-xs"
-              >
-                + Earn Additional Badge
-              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">

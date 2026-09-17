@@ -1,7 +1,6 @@
 import { 
   Job, 
   Candidate, 
-  SimulatorChallenge, 
   IngestionLogEntry, 
   BuildLogEntry,
   JobApplication,
@@ -35,7 +34,6 @@ export const INITIAL_JOBS: Job[] = [
       'Understanding of tokenization, prompt latency, and structured outputs',
       'Strictly 0 to 1 year of professional experience or recent graduate'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-prompt-guard'],
     postedDate: '1 hour ago',
     applicantCount: 8,
     isVerifiedEntry: true,
@@ -66,7 +64,6 @@ export const INITIAL_JOBS: Job[] = [
       'Solid TypeScript or Python scripting abilities',
       'Demonstrated portfolio project or verified RAG badge'
     ],
-    simulatorsRecommended: ['sim-rag-config'],
     postedDate: '3 hours ago',
     applicantCount: 15,
     isVerifiedEntry: true,
@@ -97,7 +94,6 @@ export const INITIAL_JOBS: Job[] = [
       'Enthusiasm for autonomous developer agents and LLM orchestration',
       'Fresh graduate or <= 1 year prior professional experience'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-prompt-guard'],
     postedDate: '4 hours ago',
     applicantCount: 19,
     isVerifiedEntry: true,
@@ -128,7 +124,6 @@ export const INITIAL_JOBS: Job[] = [
       'Interest in serverless GPU scaling and model serving',
       'Entry-level role (0 - 1.5 yrs experience)'
     ],
-    simulatorsRecommended: ['sim-token-cost'],
     postedDate: '5 hours ago',
     applicantCount: 23,
     isVerifiedEntry: true,
@@ -159,7 +154,6 @@ export const INITIAL_JOBS: Job[] = [
       'Hands-on experience building apps or tools with LLM APIs',
       'Max 1 year of professional experience or personal open-source projects'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-rag-config'],
     postedDate: '7 hours ago',
     applicantCount: 31,
     isVerifiedEntry: true,
@@ -190,7 +184,6 @@ export const INITIAL_JOBS: Job[] = [
       'Understanding of regex, PII redaction patterns, and XML demarcations',
       '0 to 1 year prior experience required'
     ],
-    simulatorsRecommended: ['sim-prompt-guard'],
     postedDate: '9 hours ago',
     applicantCount: 28,
     isVerifiedEntry: true,
@@ -221,7 +214,6 @@ export const INITIAL_JOBS: Job[] = [
       'Interest in citation grounding and factuality verification',
       '<= 2 years experience required'
     ],
-    simulatorsRecommended: ['sim-rag-config', 'sim-token-cost'],
     postedDate: '12 hours ago',
     applicantCount: 42,
     isVerifiedEntry: true,
@@ -252,90 +244,11 @@ export const INITIAL_JOBS: Job[] = [
       'Demonstrated portfolio or open-source PRs in the ML ecosystem',
       'No formal years requirement (0 - 1 yr)'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-rag-config'],
     postedDate: '1 day ago',
     applicantCount: 37,
     isVerifiedEntry: true,
     isSalaryGuaranteed: true,
     isNew: false
-  }
-];
-
-export const SIMULATOR_CHALLENGES: SimulatorChallenge[] = [
-  {
-    id: 'sim-token-cost',
-    title: 'API Token & Cost Optimization Sandbox',
-    category: 'Optimization & Economics',
-    badgeName: 'Verified Token Economist',
-    badgeIcon: 'Coins',
-    description: 'Analyze an expensive multi-turn enterprise prompt payload, reduce context bloat by 40%+, and select cost-efficient inference models without sacrificing accuracy.',
-    difficulty: 'Entry',
-    estimatedMinutes: 5,
-    instructions: [
-      'Inspect the raw prompt payload containing repetitive logs and unnecessary preamble.',
-      'Apply token pruning strategies (schema minification, system compression).',
-      'Select the optimal model architecture to achieve target cost under $0.005 / run.',
-      'Submit your configuration for automated verification and unlock the badge.'
-    ],
-    type: 'token_cost',
-    badgeReward: {
-      id: 'badge-token-economist',
-      name: 'Token Economist (Verified)',
-      category: 'Optimization',
-      description: 'Demonstrated mastery in context pruning, prompt compression, and token-cost minimization.',
-      verificationCode: 'VER-TOK-9921-ISO',
-      icon: 'Zap'
-    }
-  },
-  {
-    id: 'sim-rag-config',
-    title: 'RAG Pipeline Retrieval Precision Sandbox',
-    category: 'RAG & Semantic Retrieval',
-    badgeName: 'RAG Architecture Specialist',
-    badgeIcon: 'Layers',
-    description: 'Tune chunk size, chunk overlap ratio, vector similarity metric, and top-k retrieval parameters on a sample technical documentation corpus to achieve >85% precision.',
-    difficulty: 'Junior',
-    estimatedMinutes: 6,
-    instructions: [
-      'Review document boundary patterns in the technical knowledge corpus.',
-      'Adjust chunk size between 128 and 1024 tokens with optimal overlap (10-20%).',
-      'Configure similarity thresholds and top-K parameter to eliminate hallucination noise.',
-      'Run retrieval benchmark test to achieve pass threshold.'
-    ],
-    type: 'rag_config',
-    badgeReward: {
-      id: 'badge-rag-specialist',
-      name: 'RAG Architect (Verified)',
-      category: 'RAG & Retrieval',
-      description: 'Validated ability to architect semantic chunking and precision vector retrieval pipelines.',
-      verificationCode: 'VER-RAG-4409-ISO',
-      icon: 'Database'
-    }
-  },
-  {
-    id: 'sim-prompt-guard',
-    title: 'System Prompt & Guardrails Defense Assessment',
-    category: 'Safety & System Alignment',
-    badgeName: 'Guardrails & Safety Practitioner',
-    badgeIcon: 'ShieldCheck',
-    description: 'Harden a customer-support system prompt against 4 common adversarial jailbreaks and indirect prompt injection attempts while retaining conversational helpfulness.',
-    difficulty: 'Foundational',
-    estimatedMinutes: 5,
-    instructions: [
-      'Analyze the vulnerable base system prompt.',
-      'Inject explicit boundary delimiters and strict output schema constraints.',
-      'Run the live attack evaluation suite (Base64 trick, Developer mode exploit, Delimiter override).',
-      'Pass all 4 red-team probes to earn the verified safety badge.'
-    ],
-    type: 'prompt_guard',
-    badgeReward: {
-      id: 'badge-safety-practitioner',
-      name: 'Safety & Guardrails (Verified)',
-      category: 'Prompt & Safety',
-      description: 'Proven skills in mitigating prompt injection and implementing strict operational boundaries.',
-      verificationCode: 'VER-SEC-7812-ISO',
-      icon: 'ShieldCheck'
-    }
   }
 ];
 
@@ -389,9 +302,9 @@ export const INITIAL_CANDIDATES: Candidate[] = [
         stack: ['TypeScript', 'Vite', 'Vitest']
       }
     ],
-    simulatorScores: [
-      { simulatorId: 'sim-token-cost', simulatorName: 'Token & Cost Optimization', score: 98, maxScore: 100, date: '2026-08-20' },
-      { simulatorId: 'sim-prompt-guard', simulatorName: 'Guardrails Defense', score: 100, maxScore: 100, date: '2026-08-22' }
+    skillEvaluations: [
+      { evaluationId: 'eval-token-cost', evaluationName: 'Token & Cost Optimization', score: 98, maxScore: 100, date: '2026-08-20' },
+      { evaluationId: 'eval-prompt-guard', evaluationName: 'Guardrails Defense', score: 100, maxScore: 100, date: '2026-08-22' }
     ],
     availability: 'Immediate',
     verified: true
@@ -429,8 +342,8 @@ export const INITIAL_CANDIDATES: Candidate[] = [
         stack: ['Python', 'FastAPI', 'Qdrant', 'SentenceTransformers']
       }
     ],
-    simulatorScores: [
-      { simulatorId: 'sim-rag-config', simulatorName: 'RAG Retrieval Precision', score: 94, maxScore: 100, date: '2026-08-25' }
+    skillEvaluations: [
+      { evaluationId: 'eval-rag-config', evaluationName: 'RAG Retrieval Precision', score: 94, maxScore: 100, date: '2026-08-25' }
     ],
     availability: '2 Weeks',
     verified: true
@@ -477,9 +390,9 @@ export const INITIAL_CANDIDATES: Candidate[] = [
         stack: ['TypeScript', 'Express', 'Prometheus', 'Tailwind']
       }
     ],
-    simulatorScores: [
-      { simulatorId: 'sim-token-cost', simulatorName: 'Token & Cost Optimization', score: 92, maxScore: 100, date: '2026-08-26' },
-      { simulatorId: 'sim-rag-config', simulatorName: 'RAG Retrieval Precision', score: 88, maxScore: 100, date: '2026-08-27' }
+    skillEvaluations: [
+      { evaluationId: 'eval-token-cost', evaluationName: 'Token & Cost Optimization', score: 92, maxScore: 100, date: '2026-08-26' },
+      { evaluationId: 'eval-rag-config', evaluationName: 'RAG Retrieval Precision', score: 88, maxScore: 100, date: '2026-08-27' }
     ],
     availability: 'Immediate',
     verified: true
@@ -538,7 +451,7 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
     version: 'v0.3.0',
     buildDate: '2026-08-28',
     milestone: 'User Feature Matrix Definition',
-    deliverables: 'Formalized core functionality specs for Job Seekers and Recruiters, verified badge mechanics, and sandbox simulator guidelines.',
+    deliverables: 'Formalized core functionality specs for Job Seekers and Recruiters, verified badge mechanics, and technical evaluation guidelines.',
     status: 'Completed'
   },
   {
@@ -552,7 +465,7 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
     version: 'v0.4.0',
     buildDate: '2026-08-28',
     milestone: 'Frontend Layout & Design System',
-    deliverables: 'Implementation of Tailwind CSS layout, multi-source job feed with p-6 spacing, interactive simulators, recruiter views, and personalized settings.',
+    deliverables: 'Implementation of Tailwind CSS layout, multi-source job feed with p-6 spacing, skill attestation badges, recruiter views, and personalized settings.',
     status: 'Completed'
   },
   {
@@ -572,8 +485,8 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
   {
     version: 'v0.7.0',
     buildDate: '2026-08-28',
-    milestone: 'Skill Simulator Suite & Cryptographic Attestation',
-    deliverables: 'Created modular sandboxes (TokenOptimizer, RAGChunker, GuardrailTester), multi-vector assertion test runner (badgeAttestation.ts), real-time metric tracking, and cryptographic profile badge minting.',
+    milestone: 'Skill Attestation Suite & Cryptographic Verification',
+    deliverables: 'Created verified technical benchmarks, multi-vector assertion test runner (badgeAttestation.ts), real-time metric tracking, and cryptographic profile badge minting.',
     status: 'Completed'
   },
   {
@@ -587,7 +500,7 @@ export const BUILD_LOG_ENTRIES: BuildLogEntry[] = [
     version: 'v0.9.0',
     buildDate: '2026-08-28',
     milestone: 'Tabernacle Theme & Aesthetic Integration',
-    deliverables: 'Refactored visual architecture to the sacred Tabernacle Palette (Tekhelet Blue #1D4ED8, Royal Argaman Purple #7C3AED, Vibrant Scarlet #DC2626, Fine Linen #F8FAFC, Sacred Gold #F59E0B), implemented the 45-degree left-angled rocket brand logo, updated navigation & simulator sandboxes with gold attestation badging, and enforced generous p-6+ whitespace.',
+    deliverables: 'Refactored visual architecture to the sacred Tabernacle Palette (Tekhelet Blue #1D4ED8, Royal Argaman Purple #7C3AED, Vibrant Scarlet #DC2626, Fine Linen #F8FAFC, Sacred Gold #F59E0B), implemented the 45-degree left-angled rocket brand logo, updated navigation with gold attestation badging, and enforced generous p-6+ whitespace.',
     status: 'Completed'
   },
   {
@@ -730,7 +643,7 @@ export const INITIAL_SECURITY_LOGS: SecurityAuditLog[] = [
     eventType: 'ATTESTATION_MINTED',
     ipAddress: '192.0.2.45',
     severity: 'INFO',
-    endpoint: '/api/simulators/attest',
+    endpoint: '/api/attestations/mint',
     details: 'Cryptographic assertion hash sha256:7f4a... generated for user Alex Vance (Token Economist).',
     status: 'AUDITED'
   },

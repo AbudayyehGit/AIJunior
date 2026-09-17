@@ -209,7 +209,6 @@ let liveJobsDatabase: any[] = [
       'Understanding of tokenization, prompt latency, and structured outputs',
       'Strictly 0 to 1 year of professional experience or recent graduate'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-prompt-guard'],
     postedDate: '1 hour ago',
     applicantCount: 8,
     isVerifiedEntry: true,
@@ -240,7 +239,6 @@ let liveJobsDatabase: any[] = [
       'Solid TypeScript or Python scripting abilities',
       'Demonstrated portfolio project or verified RAG badge'
     ],
-    simulatorsRecommended: ['sim-rag-config'],
     postedDate: '3 hours ago',
     applicantCount: 15,
     isVerifiedEntry: true,
@@ -271,7 +269,6 @@ let liveJobsDatabase: any[] = [
       'Enthusiasm for autonomous developer agents and LLM orchestration',
       'Fresh graduate or <= 1 year prior professional experience'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-prompt-guard'],
     postedDate: '4 hours ago',
     applicantCount: 19,
     isVerifiedEntry: true,
@@ -302,7 +299,6 @@ let liveJobsDatabase: any[] = [
       'Interest in serverless GPU scaling and model serving',
       'Entry-level role (0 - 1.5 yrs experience)'
     ],
-    simulatorsRecommended: ['sim-token-cost'],
     postedDate: '5 hours ago',
     applicantCount: 23,
     isVerifiedEntry: true,
@@ -333,7 +329,6 @@ let liveJobsDatabase: any[] = [
       'Hands-on experience building apps or tools with LLM APIs',
       'Max 1 year of professional experience or personal open-source projects'
     ],
-    simulatorsRecommended: ['sim-token-cost', 'sim-rag-config'],
     postedDate: '7 hours ago',
     applicantCount: 31,
     isVerifiedEntry: true,
@@ -364,7 +359,6 @@ let liveJobsDatabase: any[] = [
       'Understanding of regex, PII redaction patterns, and XML demarcations',
       '0 to 1 year prior experience required'
     ],
-    simulatorsRecommended: ['sim-prompt-guard'],
     postedDate: '9 hours ago',
     applicantCount: 28,
     isVerifiedEntry: true,
@@ -408,8 +402,8 @@ let candidatesDatabase: any[] = [
         stack: ['Python', 'Typer', 'Gemini API', 'Rich']
       }
     ],
-    simulatorScores: [
-      { simulatorId: 'sim-token-cost', simulatorName: 'Token & Cost Optimization', score: 98, maxScore: 100, date: '2026-08-20' }
+    skillEvaluations: [
+      { evaluationId: 'eval-token-cost', evaluationName: 'Token & Cost Optimization', score: 98, maxScore: 100, date: '2026-08-20' }
     ],
     availability: 'Immediate',
     verified: true
@@ -447,8 +441,8 @@ let candidatesDatabase: any[] = [
         stack: ['Python', 'FastAPI', 'Qdrant', 'SentenceTransformers']
       }
     ],
-    simulatorScores: [
-      { simulatorId: 'sim-rag-config', simulatorName: 'RAG Retrieval Precision', score: 94, maxScore: 100, date: '2026-08-25' }
+    skillEvaluations: [
+      { evaluationId: 'eval-rag-config', evaluationName: 'RAG Retrieval Precision', score: 94, maxScore: 100, date: '2026-08-25' }
     ],
     availability: '2 Weeks',
     verified: true
@@ -874,7 +868,6 @@ app.post('/api/jobs', (req, res) => {
     source: newJob.source || 'Direct',
     tags: Array.isArray(newJob.tags) ? newJob.tags : ['AI', 'Junior'],
     requirements: Array.isArray(newJob.requirements) ? newJob.requirements : [],
-    simulatorsRecommended: Array.isArray(newJob.simulatorsRecommended) ? newJob.simulatorsRecommended : ['sim-token-cost'],
     isVerifiedEntry: true,
     isSalaryGuaranteed: true,
     isNew: true,
@@ -1105,6 +1098,65 @@ app.get('/api/ingest/stats', (req, res) => {
     activeJobsInDb: liveJobsDatabase.length,
     activeSSEListeners: sseClients.length,
     recentBatches: ingestionRunHistory.slice(0, 10)
+  });
+});
+
+// ==========================================
+// STEADY-STATE OPERATIONAL MAINTENANCE LOOP
+// ==========================================
+function enforceSteadyState(): { mockPurged: number; expiredFlagged: number; remainingActive: number } {
+  const initialLength = liveJobsDatabase.length;
+
+  // 1. Mandatory Data Purge: Remove all mock / test listings
+  liveJobsDatabase = liveJobsDatabase.filter((j) => {
+    const company = (j.company || '').toLowerCase();
+    const title = (j.title || '').toLowerCase();
+    const isMock = company.includes('mock') || company.includes('test') || title.includes('test');
+    return !isMock;
+  });
+  const mockPurged = initialLength - liveJobsDatabase.length;
+
+  // 2. Flag stale listings (>7 days old) as expired
+  let expiredFlagged = 0;
+  liveJobsDatabase.forEach((job) => {
+    if (!job.status) job.status = 'active';
+    const posted = (job.postedDate || '').toLowerCase();
+    const isOlderThan7Days = /([8-9]|\d{2,})\s*days?\s*ago|weeks?\s*ago|months?\s*ago/i.test(posted);
+    if (isOlderThan7Days && job.status !== 'expired') {
+      job.status = 'expired';
+      expiredFlagged++;
+    }
+  });
+
+  const remainingActive = liveJobsDatabase.filter((j) => j.status !== 'expired').length;
+
+  if (mockPurged > 0 || expiredFlagged > 0) {
+    securityLogsDatabase.unshift({
+      id: `sec-steady-${Date.now()}`,
+      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
+      eventType: 'STEADY_STATE_MAINTENANCE',
+      endpoint: '/api/maintenance/steady-state',
+      severity: 'INFO',
+      details: `Steady-state equilibrium enforced: ${mockPurged} mock/test records purged, ${expiredFlagged} stale listings (>7d) marked expired. Active count: ${remainingActive}`,
+      status: 'SUCCESS'
+    });
+  }
+
+  return { mockPurged, expiredFlagged, remainingActive };
+}
+
+// Enforce steady state immediately upon server launch
+enforceSteadyState();
+
+// Register recurring maintenance cycle (runs every hour)
+setInterval(enforceSteadyState, 60 * 60 * 1000);
+
+app.post('/api/maintenance/steady-state', (req, res) => {
+  const result = enforceSteadyState();
+  res.json({
+    status: 'ok',
+    message: 'Steady-state maintenance executed successfully',
+    ...result
   });
 });
 

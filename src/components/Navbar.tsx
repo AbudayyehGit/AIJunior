@@ -18,7 +18,7 @@ import {
   LogIn
 } from 'lucide-react';
 
-export type NavTabType = 'jobs' | 'simulators' | 'candidates' | 'seeker_portal' | 'recruiter_portal' | 'admin' | 'ingestion' | 'buildlog';
+export type NavTabType = 'jobs' | 'candidates' | 'seeker_portal' | 'recruiter_portal' | 'admin' | 'ingestion' | 'buildlog';
 
 interface NavbarProps {
   activeTab: NavTabType;
@@ -185,25 +185,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             {savedJobsCount > 0 && (
               <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold bg-[#FAF0D4] text-[#8A6714] rounded-full">
                 {savedJobsCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            id="nav-tab-simulators"
-            onClick={() => setActiveTab('simulators')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
-              activeTab === 'simulators'
-                ? 'bg-[#FBFBFA] text-[#2C3E50] font-black shadow-xs border border-[#C0DDEB]'
-                : 'text-[#E0EEF5] hover:text-white hover:bg-[#2E668B]/60'
-            }`}
-          >
-            <Cpu className={`w-3.5 h-3.5 ${activeTab === 'simulators' ? 'text-[#C59B27]' : 'text-[#F4E0A9]'}`} />
-            <span>Skill Simulators</span>
-            {earnedBadgesCount > 0 && (
-              <span className="ml-1 flex items-center gap-1 px-1.5 py-0.2 text-[10px] font-bold bg-[#C59B27] text-white rounded-full shadow-sanctuary-glow">
-                <Award className="w-3 h-3" />
-                {earnedBadgesCount}
               </span>
             )}
           </button>

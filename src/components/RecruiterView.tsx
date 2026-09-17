@@ -59,7 +59,7 @@ export const RecruiterView: React.FC<RecruiterViewProps> = ({
             Pre-Vetted Junior AI Pipeline
           </h1>
           <p className="text-[#E0EEF5] text-sm md:text-base leading-relaxed">
-            Every candidate below has proven their technical ability through practical simulator sandboxes and verified code repositories. Zero resume keyword fluff.
+            Every candidate below has proven their technical ability through practical evaluations, technical benchmarks, and verified code repositories. Zero resume keyword fluff.
           </p>
         </div>
 
@@ -243,12 +243,12 @@ export const RecruiterView: React.FC<RecruiterViewProps> = ({
             {/* Scorecard */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E8193]">
-                Verified Simulator Evaluation Scorecard
+                Verified Technical Evaluation Scorecard
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {selectedCandidate.simulatorScores.map((score, i) => (
+                {selectedCandidate.skillEvaluations?.map((score, i) => (
                   <div key={i} className="p-3.5 bg-[#FAF0D4]/60 rounded-2xl border border-[#C59B27]/40">
-                    <div className="text-xs font-bold text-[#2C3E50]">{score.simulatorName}</div>
+                    <div className="text-xs font-bold text-[#2C3E50]">{score.evaluationName}</div>
                     <div className="text-xl font-black text-[#8A6714] font-mono mt-1">
                       {score.score}/{score.maxScore} <span className="text-xs text-[#8A6714] font-normal">Passed</span>
                     </div>

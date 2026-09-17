@@ -201,7 +201,6 @@ export function validateSafeParameterizedQuery(query: string): {
 export type AppPermission = 
   | 'view_jobs'
   | 'save_jobs'
-  | 'take_simulators'
   | 'post_jobs'
   | 'view_candidates'
   | 'export_candidates'
@@ -214,20 +213,17 @@ export type AppPermission =
 export const ROLE_PERMISSIONS: Record<UserRole, AppPermission[]> = {
   job_seeker: [
     'view_jobs',
-    'save_jobs',
-    'take_simulators'
+    'save_jobs'
   ],
   recruiter: [
     'view_jobs',
     'post_jobs',
     'view_candidates',
-    'export_candidates',
-    'take_simulators'
+    'export_candidates'
   ],
   admin: [
     'view_jobs',
     'save_jobs',
-    'take_simulators',
     'post_jobs',
     'view_candidates',
     'export_candidates',

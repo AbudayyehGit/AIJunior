@@ -50,7 +50,7 @@ export const BuildLogView: React.FC<BuildLogViewProps> = ({ entries }) => {
             <Cpu className="w-4 h-4 text-[#C59B27]" /> ISO/IEC/IEEE 29148
           </div>
           <p className="text-xs text-[#4A5D70] leading-relaxed">
-            Unambiguous traceability across requirements, simulator test benches, and candidate badge awards.
+            Unambiguous traceability across requirements, technical evaluation benches, and candidate badge awards.
           </p>
         </div>
 

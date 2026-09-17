@@ -190,7 +190,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </h4>
               {earnedBadges.length === 0 ? (
                 <div className="p-4 bg-[#F4F4F0] rounded-2xl border border-[#CCD2D8] text-xs text-[#6E8193] text-center">
-                  Take a skill simulator sandbox to attach Sanctuary Gold badges to your profile.
+                  Verified technical credentials and skill badges will attach to your profile.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -240,17 +240,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 <label className="flex items-center justify-between p-3.5 bg-[#F4F4F0] rounded-2xl border border-[#CCD2D8] cursor-pointer">
                   <span className="text-xs font-bold text-[#2C3E50]">
-                    Simulator challenge releases & badge updates
+                    Email digest of matched entry-level roles
                   </span>
                   <input
                     type="checkbox"
-                    checked={formData.notifications.simulatorPassAlerts}
+                    checked={formData.notifications.emailAlerts}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
                         notifications: {
                           ...formData.notifications,
-                          simulatorPassAlerts: e.target.checked,
+                          emailAlerts: e.target.checked,
                         },
                       })
                     }

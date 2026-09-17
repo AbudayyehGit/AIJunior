@@ -8,12 +8,10 @@ import {
   Building2, 
   CheckCircle2, 
   ExternalLink, 
-  Cpu, 
   Share2, 
   Bookmark, 
   BookmarkCheck, 
-  Sparkles,
-  ArrowRight
+  Sparkles
 } from 'lucide-react';
 
 interface JobDetailModalProps {
@@ -21,7 +19,6 @@ interface JobDetailModalProps {
   onClose: () => void;
   isSaved: boolean;
   onToggleSave: (jobId: string) => void;
-  onLaunchSimulator: (simId: string) => void;
 }
 
 export const JobDetailModal: React.FC<JobDetailModalProps> = ({
@@ -29,7 +26,6 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
   onClose,
   isSaved,
   onToggleSave,
-  onLaunchSimulator,
 }) => {
   if (!job) return null;
 
@@ -146,30 +142,6 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
               ))}
             </ul>
           </div>
-
-          {/* Recommended Simulator Banner */}
-          {job.simulatorsRecommended && job.simulatorsRecommended.length > 0 && (
-            <div className="bg-[#FAF0D4] border border-[#C59B27]/40 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#8A6714] uppercase">
-                  <Cpu className="w-4 h-4 text-[#C59B27]" /> Stand Out with a Sanctuary Gold Simulator Badge
-                </div>
-                <div className="text-sm font-semibold text-[#2C3E50]">
-                  Prove your skills in our interactive sandbox before submitting your application.
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  onClose();
-                  onLaunchSimulator(job.simulatorsRecommended![0]);
-                }}
-                className="px-4 py-2.5 rounded-xl bg-[#C59B27] hover:bg-[#AA821C] text-white font-bold text-xs shadow-sanctuary-glow flex items-center gap-2 whitespace-nowrap transition-all"
-              >
-                <span>Launch Challenge</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
 
           {/* Technology Tags */}
           <div className="space-y-2">

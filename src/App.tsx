@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Job, 
   Candidate, 
-  SimulatorChallenge, 
   SkillBadge, 
   IngestionLogEntry, 
   UserSettings, 
@@ -16,15 +15,12 @@ import {
   AuthUser
 } from './types';
 import { 
-  SIMULATOR_CHALLENGES, 
   INGESTION_LOGS, 
   BUILD_LOG_ENTRIES
 } from './data/mockData';
 import { Navbar, NavTabType } from './components/Navbar';
 import { JobFeed } from './components/JobFeed';
 import { JobDetailModal } from './components/JobDetailModal';
-import { SkillSimulatorsView } from './components/SkillSimulatorsView';
-import { SimulatorModal } from './components/SimulatorModal';
 import { RecruiterView } from './components/RecruiterView';
 import { IngestionMonitor } from './components/IngestionMonitor';
 import { BuildLogView } from './components/BuildLogView';
@@ -61,7 +57,6 @@ export default function App() {
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
   const [savedCandidateIds, setSavedCandidateIds] = useState<string[]>([]);
   const [selectedJobForDetail, setSelectedJobForDetail] = useState<Job | null>(null);
-  const [activeSimulator, setActiveSimulator] = useState<SimulatorChallenge | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -76,8 +71,7 @@ export default function App() {
   const [minSalaryFilter, setMinSalaryFilter] = useState<number>(70000);
   const [remoteFilter, setRemoteFilter] = useState<RemoteType | 'ALL'>('ALL');
 
-  // Simulators & Badges State
-  const [challenges] = useState<SimulatorChallenge[]>(SIMULATOR_CHALLENGES);
+  // Badges State
   const [earnedBadges, setEarnedBadges] = useState<SkillBadge[]>([
     {
       id: 'badge-token-economist',
@@ -122,8 +116,7 @@ export default function App() {
     },
     notifications: {
       emailAlerts: true,
-      newEntryLevelDrops: true,
-      simulatorPassAlerts: true
+      newEntryLevelDrops: true
     }
   });
 
@@ -373,11 +366,6 @@ export default function App() {
     });
   };
 
-  const handleLaunchSimulator = (simulatorId: string) => {
-    const target = challenges.find((c) => c.id === simulatorId) || challenges[0];
-    setActiveSimulator(target);
-  };
-
   const handleBadgeEarned = async (badge: SkillBadge) => {
     if (!earnedBadges.some((b) => b.id === badge.id)) {
       setEarnedBadges((prev) => [...prev, badge]);
@@ -581,7 +569,6 @@ export default function App() {
             setRemoteFilter={setRemoteFilter}
             onToggleSaveJob={handleToggleSaveJob}
             onSelectJob={(job) => setSelectedJobForDetail(job)}
-            onLaunchSimulator={handleLaunchSimulator}
             onResetFilters={handleResetFilters}
             onTriggerSync={handleTriggerSync}
             isSyncing={isSyncing}
@@ -589,19 +576,9 @@ export default function App() {
           />
         )}
 
-        {/* VIEW 2: INTERACTIVE SKILL SIMULATORS */}
-        {activeTab === 'simulators' && (
-          <SkillSimulatorsView
-            challenges={challenges}
-            earnedBadges={earnedBadges}
-            onOpenChallenge={(chal) => setActiveSimulator(chal)}
-          />
-        )}
-
-        {/* VIEW 3: JOB SEEKER DASHBOARD */}
+        {/* VIEW 2: JOB SEEKER DASHBOARD */}
         {activeTab === 'seeker_portal' && (
           <SeekerDashboard
-            onLaunchSimulator={handleLaunchSimulator}
             earnedBadges={earnedBadges}
             applications={applications}
             onUpdateStatus={handleUpdateApplicationStatus}
@@ -611,7 +588,7 @@ export default function App() {
           />
         )}
 
-        {/* VIEW 4: RECRUITER PORTAL */}
+        {/* VIEW 3: RECRUITER PORTAL */}
         {activeTab === 'recruiter_portal' && (
           <RecruiterDashboard
             candidates={candidates}
@@ -699,17 +676,6 @@ export default function App() {
           onClose={() => setSelectedJobForDetail(null)}
           isSaved={savedJobIds.includes(selectedJobForDetail.id)}
           onToggleSave={handleToggleSaveJob}
-          onLaunchSimulator={handleLaunchSimulator}
-        />
-      )}
-
-      {/* Simulator Modal for Interactive Sandboxes */}
-      {activeSimulator && (
-        <SimulatorModal
-          challenge={activeSimulator}
-          onClose={() => setActiveSimulator(null)}
-          onBadgeEarned={handleBadgeEarned}
-          alreadyEarned={earnedBadges.some((b) => b.id === activeSimulator.badgeReward.id)}
         />
       )}
 
@@ -750,7 +716,6 @@ export default function App() {
 
           <div className="flex items-center gap-4 font-semibold flex-wrap justify-center">
             <button onClick={() => setActiveTab('jobs')} className="hover:text-[#C59B27] transition-colors cursor-pointer min-h-[36px] px-2">Feed</button>
-            <button onClick={() => setActiveTab('simulators')} className="hover:text-[#C59B27] transition-colors cursor-pointer min-h-[36px] px-2">Simulators</button>
             <button onClick={() => setActiveTab('seeker_portal')} className="hover:text-[#C59B27] transition-colors cursor-pointer min-h-[36px] px-2">Candidate Portal</button>
             <button onClick={() => setActiveTab('recruiter_portal')} className="hover:text-[#C59B27] transition-colors cursor-pointer min-h-[36px] px-2">Recruiter Portal</button>
             <button onClick={() => setActiveTab('admin')} className="hover:text-[#C59B27] transition-colors cursor-pointer min-h-[36px] px-2">Admin Control</button>

@@ -169,7 +169,7 @@ export class IngestionValidator {
       };
     }
 
-    // Sanitize and assign simulator recommendations based on tags & title
+    // Sanitize job text and enforce verification flags
     const sanitizedJob: Job = {
       ...job,
       title: job.title.trim(),
@@ -177,8 +177,7 @@ export class IngestionValidator {
       summary: this.stripHtml(job.summary).trim(),
       description: this.stripHtml(job.description).trim(),
       isVerifiedEntry: true,
-      isSalaryGuaranteed: true,
-      simulatorsRecommended: this.inferRecommendedSimulators(job)
+      isSalaryGuaranteed: true
     };
 
     return {
@@ -194,30 +193,5 @@ export class IngestionValidator {
   private static stripHtml(input: string): string {
     if (!input) return '';
     return input.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
-  }
-
-  /**
-   * Auto-assign relevant skill sandboxes based on tech tags & title keywords
-   */
-  private static inferRecommendedSimulators(job: Partial<Job>): string[] {
-    const recs: string[] = [];
-    const text = ((job.title || '') + ' ' + (job.tags || []).join(' ') + ' ' + (job.description || '')).toLowerCase();
-
-    if (/rag|vector|retrieval|embedding|chunk|pinecone|qdrant|chroma/i.test(text)) {
-      recs.push('sim-rag-config');
-    }
-    if (/token|cost|budget|latency|inference|ops|eval|benchmark|optimiz/i.test(text)) {
-      recs.push('sim-token-cost');
-    }
-    if (/prompt|guard|safety|jailbreak|align|red\s*team|security/i.test(text)) {
-      recs.push('sim-prompt-guard');
-    }
-
-    // Default to at least one simulator if none inferred
-    if (recs.length === 0) {
-      recs.push('sim-token-cost');
-    }
-
-    return Array.from(new Set(recs));
   }
 }

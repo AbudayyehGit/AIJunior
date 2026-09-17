@@ -10,9 +10,7 @@ import {
   Bookmark, 
   BookmarkCheck, 
   Sparkles, 
-  ArrowUpRight,
-  Cpu,
-  Award
+  ArrowUpRight
 } from 'lucide-react';
 
 interface JobCardProps {
@@ -20,7 +18,6 @@ interface JobCardProps {
   isSaved: boolean;
   onToggleSave: (jobId: string) => void;
   onSelectJob: (job: Job) => void;
-  onLaunchSimulator: (simId: string) => void;
 }
 
 export const JobCard: React.FC<JobCardProps> = ({
@@ -28,7 +25,6 @@ export const JobCard: React.FC<JobCardProps> = ({
   isSaved,
   onToggleSave,
   onSelectJob,
-  onLaunchSimulator,
 }) => {
   const getSourceBadgeStyle = (source: string = '') => {
     switch (source) {
@@ -169,17 +165,6 @@ export const JobCard: React.FC<JobCardProps> = ({
 
       {/* Action Footer */}
       <div className="pt-3 border-t border-[#CCD2D8]/60 space-y-2.5">
-        {/* Recommended Simulator Hook */}
-        {job.simulatorsRecommended && job.simulatorsRecommended.length > 0 && (
-          <button
-            onClick={() => onLaunchSimulator(job.simulatorsRecommended![0])}
-            className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold text-[#8A6714] bg-[#FAF0D4] hover:bg-[#F4E0A9] rounded-xl transition-colors border border-[#C59B27]/40 shadow-xs cursor-pointer min-h-[44px]"
-          >
-            <Cpu className="w-3.5 h-3.5 text-[#C59B27]" />
-            <span>Test Skills &amp; Earn Sanctuary Gold Badge</span>
-          </button>
-        )}
-
         <div className="flex items-center gap-2">
           <button
             onClick={() => onSelectJob(job)}

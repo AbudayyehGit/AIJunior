@@ -21,7 +21,6 @@ export interface Job {
   summary: string;
   description: string;
   requirements: string[];
-  simulatorsRecommended?: string[];
   postedDate: string;
   applicantCount: number;
   isVerifiedEntry: boolean;
@@ -49,9 +48,9 @@ export interface CandidateProject {
   stack: string[];
 }
 
-export interface SimulatorScore {
-  simulatorId: string;
-  simulatorName: string;
+export interface SkillEvaluation {
+  evaluationId: string;
+  evaluationName: string;
   score: number;
   maxScore: number;
   date: string;
@@ -127,24 +126,10 @@ export interface Candidate {
   githubUrl: string;
   huggingfaceUrl: string;
   topProjects: CandidateProject[];
-  simulatorScores: SimulatorScore[];
+  skillEvaluations: SkillEvaluation[];
   availability: 'Immediate' | '2 Weeks' | 'Flexible';
   verified: boolean;
   email?: string;
-}
-
-export interface SimulatorChallenge {
-  id: string;
-  title: string;
-  category: string;
-  badgeName: string;
-  badgeIcon: string;
-  description: string;
-  difficulty: 'Entry' | 'Junior' | 'Foundational';
-  estimatedMinutes: number;
-  instructions: string[];
-  type: 'token_cost' | 'rag_config' | 'prompt_guard';
-  badgeReward: SkillBadge;
 }
 
 export interface IngestionLogEntry {
@@ -213,6 +198,5 @@ export interface UserSettings {
   notifications: {
     emailAlerts: boolean;
     newEntryLevelDrops: boolean;
-    simulatorPassAlerts: boolean;
   };
 }

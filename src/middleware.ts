@@ -32,8 +32,7 @@ const PROTECTED_ROUTES: Record<string, UserRole[]> = {
   '/admin': ['admin'],
   '/api/admin': ['admin'],
   '/api/jobs/sync': ['admin'],
-  '/api/jobs/post': ['recruiter', 'admin'],
-  '/api/simulators/submit': ['job_seeker', 'recruiter', 'admin']
+  '/api/jobs/post': ['recruiter', 'admin']
 };
 
 /**
@@ -52,7 +51,6 @@ export function appMiddleware(
 
   // 1. Rate Limiting Check on Sensitive Endpoints
   const isSyncEndpoint = pathname.startsWith('/api/jobs/sync');
-  const isSimulatorSubmit = pathname.startsWith('/api/simulators/submit');
 
   if (isSyncEndpoint) {
     const rateLimit = checkRateLimit(`rate_sync_${clientIp}`, 10, 60000); // 10 syncs per minute
@@ -65,21 +63,6 @@ export function appMiddleware(
           'Retry-After': rateLimit.resetSeconds.toString()
         },
         error: `Rate Limit Exceeded: Max 10 sync calls per minute. Retry in ${rateLimit.resetSeconds}s.`
-      };
-    }
-  }
-
-  if (isSimulatorSubmit) {
-    const rateLimit = checkRateLimit(`rate_sim_${clientIp}`, 20, 60000); // 20 submissions per minute
-    if (!rateLimit.allowed) {
-      return {
-        allowed: false,
-        status: 429,
-        headers: {
-          ...securityHeaders,
-          'Retry-After': rateLimit.resetSeconds.toString()
-        },
-        error: 'Too many simulator submissions. Please wait 60 seconds.'
       };
     }
   }

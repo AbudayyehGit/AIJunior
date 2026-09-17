@@ -80,6 +80,33 @@ export default function AdminDashboard({
   const [userRoleFilter, setUserRoleFilter] = useState<'ALL' | UserRole>('ALL');
   const [userActionMsg, setUserActionMsg] = useState<string | null>(null);
 
+  // Steady-State Operational State
+  const [isMaintaining, setIsMaintaining] = useState(false);
+  const [maintenanceMsg, setMaintenanceMsg] = useState<string | null>(null);
+
+  const handleTriggerSteadyState = async () => {
+    setIsMaintaining(true);
+    setMaintenanceMsg(null);
+    try {
+      const res = await fetch('/api/maintenance/steady-state', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        setMaintenanceMsg(
+          `Equilibrium verified: ${data.mockPurged} mock records purged, ${data.expiredFlagged} stale listings flagged expired. Active count: ${data.remainingActive}`
+        );
+        if (onTriggerSync) {
+          await onTriggerSync();
+        }
+      } else {
+        setMaintenanceMsg('Failed to run steady-state cycle');
+      }
+    } catch {
+      setMaintenanceMsg('Error connecting to maintenance service');
+    } finally {
+      setIsMaintaining(false);
+    }
+  };
+
   // Load Real Users from Backend
   const fetchUsers = async () => {
     setIsUsersLoading(true);
@@ -619,6 +646,44 @@ export default function AdminDashboard({
       {/* 3. INGESTION PIPELINE HISTORY */}
       {adminTab === 'ingestion' && (
         <div className="space-y-6">
+          {/* Steady-State Operational Equilibrium Card */}
+          <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-sm border border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <h3 className="text-base font-bold text-white tracking-wide">Steady-State Operational Equilibrium</h3>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">
+                  AUTO-LOOP ACTIVE (1H)
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 max-w-xl">
+                Background maintenance automatically purges mock/test artifacts, flags stale listings older than 7 days as expired, and permanently purges legacy expired records (&gt;30d).
+              </p>
+              {maintenanceMsg && (
+                <p className="text-xs text-emerald-400 font-mono pt-1">
+                  {maintenanceMsg}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={handleTriggerSteadyState}
+              disabled={isMaintaining}
+              className="px-4 py-2.5 bg-[#8B5CF6] hover:bg-[#7C3AED] disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer whitespace-nowrap min-h-[44px]"
+            >
+              {isMaintaining ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Enforcing Steady-State...</span>
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  <span>Execute Maintenance Sweep</span>
+                </>
+              )}
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Scanned</span>
@@ -742,7 +807,7 @@ export default function AdminDashboard({
             <div>
               <h2 className="text-lg font-bold text-slate-900">Cryptographic Attestation &amp; Competency Proofs</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Every simulator completion is hashed with sha256 and signed via ed25519 to eliminate resume exaggeration.
+                Every skill attestation and competency benchmark is hashed with sha256 and signed via ed25519 to eliminate resume exaggeration.
               </p>
             </div>
 

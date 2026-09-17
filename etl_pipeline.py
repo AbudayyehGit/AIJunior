@@ -388,6 +388,7 @@ class JobDatabase:
             salary_min INTEGER,
             salary_max INTEGER,
             source_url TEXT UNIQUE NOT NULL,
+            status TEXT DEFAULT 'active',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -399,6 +400,13 @@ class JobDatabase:
         """
         with self.get_connection() as conn:
             conn.executescript(schema)
+            # Ensure status column exists for backwards compatibility
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA table_info(job_listings);")
+            columns = [row[1] for row in cursor.fetchall()]
+            if "status" not in columns:
+                cursor.execute("ALTER TABLE job_listings ADD COLUMN status TEXT DEFAULT 'active';")
+                conn.commit()
             logger.info("SQLite schema initialized at %s", self.db_path)
 
     def upsert_batch(self, jobs: List[JobListing]) -> Dict[str, int]:
@@ -411,9 +419,9 @@ class JobDatabase:
 
         upsert_query = """
         INSERT INTO job_listings (
-            title, company, location, employment_type, salary_min, salary_max, source_url, updated_at
+            title, company, location, employment_type, salary_min, salary_max, source_url, status, updated_at
         ) VALUES (
-            :title, :company, :location, :employment_type, :salary_min, :salary_max, :source_url, CURRENT_TIMESTAMP
+            :title, :company, :location, :employment_type, :salary_min, :salary_max, :source_url, 'active', CURRENT_TIMESTAMP
         )
         ON CONFLICT(source_url) DO UPDATE SET
             title = excluded.title,
@@ -422,6 +430,7 @@ class JobDatabase:
             employment_type = excluded.employment_type,
             salary_min = excluded.salary_min,
             salary_max = excluded.salary_max,
+            status = 'active',
             updated_at = CURRENT_TIMESTAMP
         RETURNING (created_at = updated_at) AS is_new;
         """
@@ -463,6 +472,45 @@ class JobDatabase:
             conn.commit()
             logger.info("Pre-flight purge executed: removed %d mock/test records from SQLite.", purged)
             return purged
+
+    def enforce_steady_state(self, stale_days: int = 7, deep_purge_days: int = 30) -> Dict[str, int]:
+        """
+        Background maintenance loop:
+        1. Executes targeted database wipe of any mock/test listings:
+           DELETE FROM job_listings WHERE company LIKE '%Mock%' OR company LIKE '%Test%' OR title LIKE '%Test%';
+        2. Flags stale listings older than 7 days as 'expired'.
+        3. Safely purges deep historical expired records older than 30 days.
+        """
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            # 1. Purge any mock/test jobs
+            cursor.execute("DELETE FROM job_listings WHERE company LIKE '%Mock%' OR company LIKE '%Test%' OR title LIKE '%Test%';")
+            mock_purged = cursor.rowcount
+
+            # 2. Flag stale listings (>7 days) as expired
+            cursor.execute(
+                f"UPDATE job_listings SET status = 'expired', updated_at = CURRENT_TIMESTAMP "
+                f"WHERE status = 'active' AND datetime(created_at) < datetime('now', '-{stale_days} days');"
+            )
+            expired_flagged = cursor.rowcount
+
+            # 3. Deep purge old expired records (>30 days)
+            cursor.execute(
+                f"DELETE FROM job_listings WHERE status = 'expired' "
+                f"AND datetime(updated_at) < datetime('now', '-{deep_purge_days} days');"
+            )
+            deep_purged = cursor.rowcount
+
+            conn.commit()
+            logger.info(
+                "Steady-state maintenance executed: %d mock purged, %d flagged expired (>%dd), %d deep purged (>%dd).",
+                mock_purged, expired_flagged, stale_days, deep_purged, deep_purge_days
+            )
+            return {
+                "mock_purged": mock_purged,
+                "expired_flagged": expired_flagged,
+                "deep_purged": deep_purged,
+            }
 
     def count(self) -> int:
         with self.get_connection() as conn:
@@ -581,6 +629,10 @@ class MultiSourceJobETLPipeline:
             aggregated["total_rejected"] += res["rejected_count"]
 
         return aggregated
+
+    def enforce_steady_state(self, stale_days: int = 7, deep_purge_days: int = 30) -> Dict[str, int]:
+        """Executes the steady-state maintenance cycle across database records."""
+        return self.db.enforce_steady_state(stale_days=stale_days, deep_purge_days=deep_purge_days)
 
 
 if __name__ == "__main__":

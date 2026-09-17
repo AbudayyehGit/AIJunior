@@ -1,4 +1,4 @@
-import { SkillBadge, SimulatorScore } from '../types';
+import { SkillBadge } from '../types';
 
 export interface AssertionTestVector {
   id: string;

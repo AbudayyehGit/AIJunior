@@ -8,7 +8,6 @@ import {
   Bookmark, 
   BookmarkCheck, 
   ArrowUpRight,
-  Cpu,
   Sparkles,
   Zap
 } from 'lucide-react';
@@ -18,15 +17,13 @@ interface JobCardMobileProps {
   isSaved?: boolean;
   onToggleSave: (jobId: string) => void;
   onSelectJob: (job: Job) => void;
-  onLaunchSimulator?: (simulatorId: string) => void;
 }
 
 export const JobCardMobile: React.FC<JobCardMobileProps> = ({
   job,
   isSaved = false,
   onToggleSave,
-  onSelectJob,
-  onLaunchSimulator
+  onSelectJob
 }) => {
   const getCompanyMonogram = (name: string = '') => {
     return (name || 'AI').substring(0, 2).toUpperCase();
@@ -129,17 +126,6 @@ export const JobCardMobile: React.FC<JobCardMobileProps> = ({
           <span>ISO Verified</span>
         </span>
       </div>
-
-      {/* Simulator Hook (if available) */}
-      {job.simulatorsRecommended && job.simulatorsRecommended.length > 0 && onLaunchSimulator && (
-        <button
-          onClick={() => onLaunchSimulator(job.simulatorsRecommended![0])}
-          className="w-full min-h-[44px] flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#8A6714] bg-[#FAF0D4] hover:bg-[#F4E0A9] rounded-xl transition-colors border border-[#C59B27]/40 cursor-pointer"
-        >
-          <Cpu className="w-3.5 h-3.5 text-[#C59B27]" />
-          <span>Earn Sanctuary Competency Badge</span>
-        </button>
-      )}
 
       {/* ROW 3: Bottom Actions (Details + Quick Apply with Sanctuary Gold #C59B27) */}
       <div className="flex items-center gap-2 pt-0.5">

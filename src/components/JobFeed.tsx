@@ -22,7 +22,6 @@ interface JobFeedProps {
   setRemoteFilter: (rem: RemoteType | 'ALL') => void;
   onToggleSaveJob: (jobId: string) => void;
   onSelectJob: (job: Job) => void;
-  onLaunchSimulator: (simulatorId: string) => void;
   onResetFilters: () => void;
   onTriggerSync?: () => Promise<void>;
   isSyncing?: boolean;
@@ -44,7 +43,6 @@ export const JobFeed: React.FC<JobFeedProps> = ({
   setRemoteFilter,
   onToggleSaveJob,
   onSelectJob,
-  onLaunchSimulator,
   onResetFilters,
   onTriggerSync,
   isSyncing = false,
@@ -131,7 +129,6 @@ export const JobFeed: React.FC<JobFeedProps> = ({
                 isSaved={savedJobIds.includes(job.id)}
                 onToggleSave={onToggleSaveJob}
                 onSelectJob={onSelectJob}
-                onLaunchSimulator={onLaunchSimulator}
               />
             ))}
           </div>
@@ -145,7 +142,6 @@ export const JobFeed: React.FC<JobFeedProps> = ({
                 isSaved={savedJobIds.includes(job.id)}
                 onToggleSave={onToggleSaveJob}
                 onSelectJob={onSelectJob}
-                onLaunchSimulator={onLaunchSimulator}
               />
             ))}
           </div>
