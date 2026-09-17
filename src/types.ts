@@ -166,6 +166,30 @@ export interface BuildLogEntry {
   status: 'Completed' | 'Pending' | 'Ready for Execution';
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  membershipTier: 'Free' | 'Pro Candidate' | 'Enterprise Recruiter' | 'Superadmin';
+  status: 'Active' | 'Suspended' | 'Pending Verification';
+  attestedBadgesCount: number;
+  createdAt: string;
+  lastLogin: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}
+
 export interface UserSettings {
   role: UserRole;
   seekerProfile: {

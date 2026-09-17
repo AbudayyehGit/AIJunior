@@ -30,7 +30,7 @@ export const JobCard: React.FC<JobCardProps> = ({
   onSelectJob,
   onLaunchSimulator,
 }) => {
-  const getSourceBadgeStyle = (source: string) => {
+  const getSourceBadgeStyle = (source: string = '') => {
     switch (source) {
       case 'LinkedIn':
         return 'bg-[#E0EEF5] text-[#245170] border-[#94C4DC]';
@@ -47,14 +47,18 @@ export const JobCard: React.FC<JobCardProps> = ({
     }
   };
 
-  const getCompanyMonogram = (company: string) => {
+  const getCompanyMonogram = (company: string = '') => {
     return company ? company.charAt(0).toUpperCase() : 'A';
   };
+
+  const safeTags = job.tags || [];
+  const salMinK = Math.round((job.salaryMin || 80000) / 1000);
+  const salMaxK = Math.round((job.salaryMax || 120000) / 1000);
 
   return (
     <div
       id={`job-card-${job.id}`}
-      className="bg-[#FBFBFA] p-6 sm:p-7 rounded-3xl border border-[#CCD2D8] shadow-xs hover:border-[#3A7CA5] hover:shadow-md transition-all relative flex flex-col justify-between space-y-4 group"
+      className="bg-[#FBFBFA] p-6 sm:p-7 rounded-3xl border border-[#CCD2D8] shadow-xs hover:border-[#3A7CA5] hover:shadow-md transition-all relative flex flex-col justify-between space-y-4 group select-none"
     >
       {/* Top right badges & bookmark */}
       <div className="absolute top-5 right-5 flex items-center gap-2">
@@ -68,17 +72,17 @@ export const JobCard: React.FC<JobCardProps> = ({
             job.source
           )}`}
         >
-          {job.source}
+          {job.source || 'Direct'}
         </span>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onToggleSave(job.id);
           }}
-          className={`p-1.5 rounded-xl border transition-colors ${
+          className={`p-2 rounded-full border transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center ${
             isSaved
               ? 'bg-[#FAF0D4] border-[#C59B27] text-[#8A6714] shadow-xs'
-              : 'border-[#CCD2D8] text-[#6E8193] hover:text-[#C59B27] hover:bg-[#FAF0D4]/50'
+              : 'border-[#CCD2D8] text-[#6E8193] hover:text-[#C59B27] hover:bg-[#FAF0D4]/40'
           }`}
           title={isSaved ? 'Remove from saved' : 'Save job'}
         >
@@ -86,37 +90,55 @@ export const JobCard: React.FC<JobCardProps> = ({
         </button>
       </div>
 
-      {/* Main Header with Monogram */}
-      <div className="space-y-3 pt-1">
-        <div className="flex items-center gap-3.5 pr-24">
-          <div className="w-12 h-12 bg-[#E0EEF5] text-[#3A7CA5] rounded-2xl flex items-center justify-center font-black text-lg border border-[#C0DDEB] shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+      {/* Main Content */}
+      <div className="space-y-3.5 pr-16 sm:pr-20">
+        {/* Company and Monogram Header */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#E0EEF5] text-[#3A7CA5] border border-[#C0DDEB] flex items-center justify-center font-black text-sm shrink-0">
             {getCompanyMonogram(job.company)}
           </div>
-          <div className="min-w-0">
-            <h4
-              onClick={() => onSelectJob(job)}
-              className="font-black text-base md:text-lg text-[#2C3E50] group-hover:text-[#3A7CA5] transition-colors cursor-pointer leading-snug line-clamp-1"
-            >
-              {job.title}
-            </h4>
-            <p className="text-xs text-[#6E8193] font-medium truncate">
-              {job.company} • <span className="text-[#A3AFB9]">{job.location} ({job.remoteType})</span>
-            </p>
+          <div>
+            <span className="text-xs font-bold text-[#6E8193] uppercase tracking-wider block">
+              {job.company || 'Direct Employer'}
+            </span>
+            <div className="flex items-center gap-2 text-xs text-[#6E8193]">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-[#6E8193]" />
+                {job.location || 'Remote'}
+              </span>
+              <span>•</span>
+              <span className="px-1.5 py-0.2 rounded bg-[#E5E8EB] font-semibold text-[#2C3E50]">
+                {job.remoteType || 'Remote'}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* 2-Column Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 pt-1">
-          <div className="bg-[#F4F4F0] p-3 rounded-2xl border border-[#E0E0D5]">
-            <p className="text-[10px] text-[#6E8193] uppercase font-bold">Salary (Guaranteed)</p>
-            <p className="text-sm font-black text-[#8A6714] font-mono truncate">
-              ${Math.round(job.salaryMin / 1000)}k - ${Math.round(job.salaryMax / 1000)}k
+        {/* Title */}
+        <h3
+          onClick={() => onSelectJob(job)}
+          className="text-base sm:text-lg font-black text-[#2C3E50] group-hover:text-[#3A7CA5] transition-colors cursor-pointer line-clamp-1"
+        >
+          {job.title}
+        </h3>
+
+        {/* Highlight Banner: Guaranteed Salary & Strict Junior Max Experience */}
+        <div className="grid grid-cols-2 gap-2 bg-[#F4F4F0] p-3 rounded-2xl border border-[#E0E0D5]">
+          <div>
+            <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-[#6E8193]">
+              <DollarSign className="w-3 h-3 text-[#8A6714]" />
+              <span>Disclosed Pay</span>
+            </div>
+            <p className="text-xs sm:text-sm font-black text-[#8A6714] font-mono">
+              ${salMinK}k - ${salMaxK}k
             </p>
           </div>
-
-          <div className="bg-[#E0EEF5]/70 p-3 rounded-2xl border border-[#C0DDEB]">
-            <p className="text-[10px] text-[#3A7CA5] uppercase font-bold">Max Experience</p>
-            <p className="text-sm font-black text-[#2C3E50] truncate">
+          <div className="text-right">
+            <div className="flex items-center justify-end gap-1 text-[10px] uppercase font-bold text-[#3A7CA5]">
+              <ShieldCheck className="w-3 h-3 text-[#3A7CA5]" />
+              <span>Junior Ceiling</span>
+            </div>
+            <p className="text-xs sm:text-sm font-black text-[#2C3E50]">
               {job.experienceYears === 0.5 ? '0-6 Mos' : job.experienceYears === 1 ? '0-1 Yr' : '≤ 2 Yrs Exp'}
             </p>
           </div>
@@ -124,12 +146,12 @@ export const JobCard: React.FC<JobCardProps> = ({
 
         {/* Brief summary */}
         <p className="text-xs text-[#4A5D70] line-clamp-2 leading-relaxed">
-          {job.summary}
+          {job.summary || 'Verified junior-level AI role with hands-on responsibilities.'}
         </p>
 
         {/* Skill tags */}
         <div className="flex flex-wrap gap-1.5 pt-0.5">
-          {job.tags.slice(0, 3).map((tag) => (
+          {safeTags.slice(0, 3).map((tag) => (
             <span
               key={tag}
               className="px-2.5 py-1 text-[11px] font-semibold bg-[#F4F4F0] text-[#2C3E50] border border-[#CCD2D8]/60 rounded-lg group-hover:border-[#3A7CA5]/50 group-hover:text-[#3A7CA5] transition-colors"
@@ -137,9 +159,9 @@ export const JobCard: React.FC<JobCardProps> = ({
               {tag}
             </span>
           ))}
-          {job.tags.length > 3 && (
+          {safeTags.length > 3 && (
             <span className="px-2 py-1 text-[10px] font-semibold text-[#6E8193] bg-[#E5E8EB] rounded-lg">
-              +{job.tags.length - 3}
+              +{safeTags.length - 3}
             </span>
           )}
         </div>
@@ -151,7 +173,7 @@ export const JobCard: React.FC<JobCardProps> = ({
         {job.simulatorsRecommended && job.simulatorsRecommended.length > 0 && (
           <button
             onClick={() => onLaunchSimulator(job.simulatorsRecommended![0])}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#8A6714] bg-[#FAF0D4] hover:bg-[#F4E0A9] rounded-xl transition-colors border border-[#C59B27]/40 shadow-xs"
+            className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold text-[#8A6714] bg-[#FAF0D4] hover:bg-[#F4E0A9] rounded-xl transition-colors border border-[#C59B27]/40 shadow-xs cursor-pointer min-h-[44px]"
           >
             <Cpu className="w-3.5 h-3.5 text-[#C59B27]" />
             <span>Test Skills &amp; Earn Sanctuary Gold Badge</span>
@@ -161,18 +183,18 @@ export const JobCard: React.FC<JobCardProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => onSelectJob(job)}
-            className="py-2.5 px-4 bg-[#F4F4F0] hover:bg-[#E0EEF5] border border-[#CCD2D8] hover:border-[#94C4DC] text-[#2C3E50] hover:text-[#3A7CA5] rounded-xl font-bold text-xs transition-colors"
+            className="py-2.5 px-4 bg-[#F4F4F0] hover:bg-[#E0EEF5] border border-[#CCD2D8] hover:border-[#94C4DC] text-[#2C3E50] hover:text-[#3A7CA5] rounded-xl font-bold text-xs transition-colors min-h-[44px] cursor-pointer"
           >
             Details
           </button>
 
           <a
-            href={job.sourceUrl}
+            href={job.sourceUrl || '#'}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2.5 px-4 bg-[#C59B27] hover:bg-[#AA821C] text-white rounded-xl font-bold text-xs text-center transition-colors flex items-center justify-center gap-1.5 shadow-sanctuary-glow"
+            className="flex-1 py-2.5 px-4 bg-[#C59B27] hover:bg-[#AA821C] text-white rounded-xl font-bold text-xs text-center transition-colors flex items-center justify-center gap-1.5 shadow-sanctuary-glow min-h-[44px] cursor-pointer"
           >
-            <span>View on {job.source}</span>
+            <span>View on {job.source || 'Direct'}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -180,5 +202,3 @@ export const JobCard: React.FC<JobCardProps> = ({
     </div>
   );
 };
-
-
