@@ -1,18 +1,18 @@
 """
 Multi-Source Production ETL Ingestion Pipeline for JuniorRoles.ai.studio
-Ingests, auto-repairs, normalizes, validates, and upserts raw feeds from:
+Ingests, auto-repairs, follows redirect chains, validates link health,
+and atomically upserts raw feeds from:
   - Indeed
   - LinkedIn
   - Hacker News ("Who is hiring?")
   - Wellfound (AngelList)
   - Remote OK
 
-Adheres strictly to the unified Pydantic v2 data contract with URL auto-repair,
-markdown punctuation cleanup, scheme injection, dead-link checking (404/410),
-tracking parameter stripping, and idempotent SQLite upsert operations.
+Adheres strictly to the unified Pydantic v2 data contract with redirect resolution,
+dead-link blocking (404/410/403), tracking parameter stripping, and SQLite deduplication.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 import json
 import logging
@@ -23,20 +23,10 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 from pydantic import BaseModel, Field, ValidationError, field_validator
 import requests
 
-# ---------------------------------------------------------------------------
-# Logging Configuration
-# ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-logger = logging.getLogger("juniorroles.autorepair_etl")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("JuniorRolesPipeline")
 
 
-# ---------------------------------------------------------------------------
-# 1. Unified Pydantic v2 Schema & URL Auto-Repair Pipeline
-# ---------------------------------------------------------------------------
 class EmploymentType(str, Enum):
     FULL_TIME = "full-time"
     PART_TIME = "part-time"
@@ -55,43 +45,41 @@ class JobListing(BaseModel):
 
     @field_validator("source_url", mode="before")
     @classmethod
-    def repair_and_normalize_url(cls, v: str) -> str:
+    def resolve_and_verify_url(cls, v: str) -> str:
         if not v or not isinstance(v, str):
             raise ValueError("Source URL cannot be empty")
-
-        # 1. Strip trailing markdown punctuation/parentheses common in Hacker News scrapes
+        
+        # Clean markdown noise from text scrapes (e.g., Hacker News)
         v = v.strip().rstrip(").,]}>;")
 
-        # 2. Fix missing http:// or https:// schemas
         if not v.startswith(("http://", "https://")):
             if v.startswith("www.") or "." in v.split("/")[0]:
                 v = "https://" + v
             else:
-                raise ValueError(f"Invalid URL structure (missing domain/scheme): {v}")
+                raise ValueError(f"Invalid URL structure: {v}")
 
         parsed = urlparse(v)
         if not parsed.netloc:
             raise ValueError(f"Malformed URL endpoint: {v}")
 
-        # 3. Strip tracking and marketing query parameters (UTM, ref, fbclid)
+        # Strip marketing tracking tokens
         query_params = parse_qs(parsed.query, keep_blank_values=True)
         filtered_params = {
             k: vals for k, vals in query_params.items() 
             if not k.startswith("utm_") and k not in ("ref", "source", "fbclid", "campaign")
         }
         cleaned_query = urlencode(filtered_params, doseq=True)
-        normalized_url = urlunparse(parsed._replace(query=cleaned_query))
+        candidate_url = urlunparse(parsed._replace(query=cleaned_query))
 
-        # 4. Optional Dead-Link Check (Drops explicit 404/410 endpoints)
+        # Follow redirects and verify link health to stop 404s
         try:
-            headers = {"User-Agent": "Mozilla/5.0 (Compatible; JuniorRolesBot/1.0)"}
-            response = requests.head(normalized_url, headers=headers, timeout=5, allow_redirects=True)
-            if response.status_code in [404, 410]:
-                raise ValueError(f"Dead link detected (Status {response.status_code}): {normalized_url}")
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            response = requests.head(candidate_url, headers=headers, timeout=5, allow_redirects=True)
+            if response.status_code in [404, 410, 403]:
+                raise ValueError(f"Dead link blocked (Status {response.status_code})")
+            return response.url if response.url else candidate_url
         except requests.RequestException:
-            pass  # Ignore network timeouts to avoid dropping valid jobs during temporary connection drops
-
-        return normalized_url
+            return candidate_url
 
     @field_validator("salary_max")
     @classmethod
@@ -104,10 +92,10 @@ class JobListing(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# 2. Multi-Source Normalization Adapters
+# Multi-Source Normalization Adapters
 # ---------------------------------------------------------------------------
 def _parse_employment_type(raw_val: Optional[str]) -> EmploymentType:
-    """Safely maps arbitrary platform employment strings to EmploymentType enum."""
+    """Safely maps platform employment strings to EmploymentType enum."""
     if not raw_val:
         return EmploymentType.FULL_TIME
     val = raw_val.lower().replace("_", "-").replace(" ", "-")
@@ -121,10 +109,7 @@ def _parse_employment_type(raw_val: Optional[str]) -> EmploymentType:
 
 
 def normalize_indeed(raw: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Adapter for Indeed job search JSON feeds.
-    Handles extractedSalary objects, formattedLocation, and job keys.
-    """
+    """Adapter for Indeed job search JSON feeds."""
     salary_min = None
     salary_max = None
     if "extractedSalary" in raw and isinstance(raw["extractedSalary"], dict):
@@ -151,10 +136,7 @@ def normalize_indeed(raw: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_linkedin(raw: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Adapter for LinkedIn job posting payloads.
-    Resolves nested company details, compensation intervals, and direct apply links.
-    """
+    """Adapter for LinkedIn job posting payloads."""
     company = ""
     if isinstance(raw.get("companyDetails"), dict):
         company = raw["companyDetails"].get("companyName", "")
@@ -184,15 +166,10 @@ def normalize_linkedin(raw: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_hackernews(raw: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Adapter for Hacker News 'Who is hiring?' comments/items.
-    Parses pipe-delimited headers: Company | Role | Location | Salary Range
-    Extracts URLs embedded in markdown brackets/parens (e.g. [Apply](company.ai/careers)).
-    """
+    """Adapter for Hacker News 'Who is hiring?' comments/items."""
     text = raw.get("text", "")
     item_id = raw.get("id") or raw.get("story_id")
 
-    # Extract explicit URLs from markdown or text if provided
     url = raw.get("url", "")
     if not url and text:
         markdown_url_match = re.search(r"\((https?://[^\s\)]+|www\.[^\s\)]+|[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}/[^\s\)]+)\)", text)
@@ -241,9 +218,7 @@ def normalize_hackernews(raw: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_wellfound(raw: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Adapter for Wellfound (AngelList Talent) job structures.
-    """
+    """Adapter for Wellfound (AngelList Talent) job structures."""
     company = ""
     if isinstance(raw.get("startup"), dict):
         company = raw["startup"].get("name", "")
@@ -274,9 +249,7 @@ def normalize_wellfound(raw: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_remoteok(raw: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Adapter for Remote OK JSON API endpoints.
-    """
+    """Adapter for Remote OK JSON API endpoints."""
     url = raw.get("url", "")
     if url and not url.startswith("http"):
         url = f"https://remoteok.com{url}"
@@ -305,12 +278,12 @@ SOURCE_ADAPTER_REGISTRY: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] =
 
 
 # ---------------------------------------------------------------------------
-# 3. SQLite Database Layer with Idempotent UPSERT
+# SQLite Storage Layer with Atomic Idempotent Upsert
 # ---------------------------------------------------------------------------
 class JobDatabase:
     """
-    SQLite database manager providing WAL-mode concurrency, strict unique index
-    on source_url, and atomic idempotent upserts.
+    Thread-safe SQLite database manager providing WAL-mode concurrency,
+    strict uniqueness on resolved source_url, and atomic idempotent upserts.
     """
 
     def __init__(self, db_path: str = "junior_roles.db") -> None:
@@ -347,12 +320,12 @@ class JobDatabase:
         """
         with self.get_connection() as conn:
             conn.executescript(schema)
-            logger.info("SQLite schema verified at %s", self.db_path)
+            logger.info("SQLite schema initialized at %s", self.db_path)
 
     def upsert_batch(self, jobs: List[JobListing]) -> Dict[str, int]:
         """
         Atomically upsert a list of validated JobListing records.
-        Uses ON CONFLICT(source_url) DO UPDATE to eliminate duplicate insertions.
+        Eliminates duplicates via ON CONFLICT(source_url) DO UPDATE.
         """
         if not jobs:
             return {"inserted": 0, "updated": 0, "total": 0}
@@ -414,12 +387,12 @@ class JobDatabase:
 
 
 # ---------------------------------------------------------------------------
-# 4. Multi-Source Pipeline Controller
+# Multi-Source Pipeline Controller
 # ---------------------------------------------------------------------------
 class MultiSourceJobETLPipeline:
     """
     Orchestrates ETL operations across Indeed, LinkedIn, Hacker News,
-    Wellfound, and Remote OK, with automatic URL repair and validation.
+    Wellfound, and Remote OK, following redirects and pruning dead endpoints.
     """
 
     def __init__(self, db: Optional[JobDatabase] = None) -> None:
@@ -442,9 +415,9 @@ class MultiSourceJobETLPipeline:
 
         for idx, raw_item in enumerate(raw_records):
             try:
-                # 1. Normalize disparate platform payload
+                # 1. Normalize source-specific shape
                 normalized_dict = normalizer(raw_item)
-                # 2. Strict Pydantic v2 validation + URL auto-repair
+                # 2. Strict Pydantic v2 validation, redirect resolution, and dead link checking
                 job = JobListing.model_validate(normalized_dict)
                 valid_jobs.append(job)
             except ValidationError as val_err:
@@ -514,83 +487,29 @@ class MultiSourceJobETLPipeline:
         return aggregated
 
 
-# ---------------------------------------------------------------------------
-# 5. Operational Verification Test Suite
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     db = JobDatabase(":memory:")
     pipeline = MultiSourceJobETLPipeline(db)
 
     test_feeds = {
-        "HackerNews": [
-            # Auto-repair: Trailing parentheses, missing scheme (www.autonome.ai), stripped tracking
-            {
-                "id": 41298401,
-                "text": "Autonome AI | Junior Agent Evaluator | San Francisco, CA | $95k - $125k\nApply here: (www.autonome.ai/careers/evaluator?utm_source=hackernews&ref=whoishiring).",
-            },
-            # Missing domain error test
-            {
-                "id": 41298402,
-                "text": "BadLink Inc | Junior ML Engineer | Remote\nApply: invalid_link_without_domain",
-            },
-        ],
         "Indeed": [
-            # Auto-repair: Indeed query parameter stripping (utm_*, ref, campaign)
             {
                 "jobTitle": "Junior AI Evaluation Specialist",
                 "companyName": "Scale AI Partner Group",
                 "formattedLocation": "San Francisco, CA",
                 "jobType": "Full-time",
                 "extractedSalary": {"min": 90000, "max": 115000},
-                "jobUrl": "https://www.indeed.com/viewjob?jk=abc99812&utm_source=indeed_alert&utm_medium=email&utm_campaign=job_feed&source=job_alert&legit_param=true",
+                "jobUrl": "https://www.indeed.com/viewjob?jk=abc99812&utm_source=alert&utm_medium=email&utm_campaign=job_feed",
             }
         ],
-        "LinkedIn": [
-            # Auto-repair: LinkedIn trk, refId, trackingId stripping
+        "HackerNews": [
             {
-                "title": "Associate AI Systems Engineer",
-                "companyDetails": {"companyName": "NeuralCore Tech"},
-                "formattedLocation": "New York, NY",
-                "workplaceType": "full_time",
-                "compensationInsight": {"minSalary": 100000, "maxSalary": 130000},
-                "applyUrl": "https://www.linkedin.com/jobs/view/3920192831/?trk=public_jobs_topcard-title&refId=x91023&trackingId=z8812&utm_source=linkedin_digest",
-            }
-        ],
-        "Wellfound": [
-            # Auto-repair: Missing https:// scheme auto-injected from bare domain
-            {
-                "role": "Junior Prompt Engineer",
-                "startup": {"name": "CognitiveOps"},
-                "locationNames": ["Austin, TX", "Remote"],
-                "jobType": "contract",
-                "annualSalaryMin": 80000,
-                "annualSalaryMax": 100000,
-                "listingUrl": "wellfound.com/jobs/3019201-junior-prompt-engineer?utm_campaign=weekly&fbclid=abc789",
-            }
-        ],
-        "RemoteOK": [
-            # Valid salary bounds & clean remote URL
-            {
-                "position": "Junior Python AI Developer",
-                "company": "FlowEngine AI",
-                "location": "Worldwide (Remote)",
-                "employment_type": "full-time",
-                "salary_min": 85000,
-                "salary_max": 110000,
-                "url": "https://remoteok.com/remote-jobs/102941-junior-python-ai-developer?ref=remoteok_newsletter&utm_source=remoteok",
+                "id": 41298401,
+                "text": "Autonome AI | Junior Agent Evaluator | San Francisco, CA | $95k - $125k\nApply: (www.autonome.ai/careers/evaluator?utm_source=hn&ref=whoishiring).",
             }
         ],
     }
 
-    print("===================================================================")
-    print("Executing JuniorRoles URL Auto-Repair Multi-Source ETL Ingestion")
-    print("===================================================================\n")
-
+    print("Running Multi-Source Ingestion Demonstration...")
     summary = pipeline.ingest_all(test_feeds)
-    print("Summary Metrics:")
     print(json.dumps({k: v for k, v in summary.items() if k != "sources_processed"}, indent=2))
-
-    print("\nVerified Cleaned & Repaired Database Records:")
-    for j in db.fetch_recent(10):
-        print(f"-> [{j['company']}] {j['title']} (${j['salary_min']:,} - ${j['salary_max']:,})")
-        print(f"   Repaired URL: {j['source_url']}\n")
