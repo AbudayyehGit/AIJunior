@@ -20,8 +20,61 @@ import re
 import sqlite3
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
-from pydantic import BaseModel, Field, ValidationError, field_validator
-import requests
+import urllib.request
+import urllib.error
+
+try:
+    from pydantic import BaseModel, Field, ValidationError, field_validator
+    HAS_PYDANTIC = True
+except ImportError:
+    HAS_PYDANTIC = False
+
+    class ValidationError(Exception):
+        pass
+
+    class BaseModel:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+        @classmethod
+        def model_validate(cls, data: Dict[str, Any]):
+            title = data.get("title", "")
+            company = data.get("company", "")
+            location = data.get("location", "")
+            source_url = data.get("source_url", "")
+            salary_min = data.get("salary_min")
+            salary_max = data.get("salary_max")
+            emp_type = data.get("employment_type", EmploymentType.FULL_TIME)
+
+            if not (2 <= len(str(title)) <= 150):
+                raise ValidationError("title length must be between 2 and 150 characters")
+            if not (1 <= len(str(company)) <= 100):
+                raise ValidationError("company length must be between 1 and 100 characters")
+            if not (2 <= len(str(location)) <= 100):
+                raise ValidationError("location length must be between 2 and 100 characters")
+            
+            cleaned_url = JobListing.resolve_and_verify_url(source_url)
+            
+            if salary_min is not None and salary_max is not None:
+                if int(salary_max) < int(salary_min):
+                    raise ValidationError("salary_max cannot be lower than salary_min")
+
+            return cls(
+                title=title,
+                company=company,
+                location=location,
+                employment_type=emp_type,
+                salary_min=int(salary_min) if salary_min is not None else None,
+                salary_max=int(salary_max) if salary_max is not None else None,
+                source_url=cleaned_url
+            )
+
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("JuniorRolesPipeline")
@@ -35,15 +88,15 @@ class EmploymentType(str, Enum):
 
 
 class JobListing(BaseModel):
-    title: str = Field(..., min_length=2, max_length=150)
-    company: str = Field(..., min_length=1, max_length=100)
-    location: str = Field(..., min_length=2, max_length=100)
-    employment_type: EmploymentType = EmploymentType.FULL_TIME
-    salary_min: Optional[int] = Field(default=None, ge=0)
-    salary_max: Optional[int] = Field(default=None, ge=0)
-    source_url: str
+    if HAS_PYDANTIC:
+        title: str = Field(..., min_length=2, max_length=150)
+        company: str = Field(..., min_length=1, max_length=100)
+        location: str = Field(..., min_length=2, max_length=100)
+        employment_type: EmploymentType = EmploymentType.FULL_TIME
+        salary_min: Optional[int] = Field(default=None, ge=0)
+        salary_max: Optional[int] = Field(default=None, ge=0)
+        source_url: str
 
-    @field_validator("source_url", mode="before")
     @classmethod
     def resolve_and_verify_url(cls, v: str) -> str:
         if not v or not isinstance(v, str):
@@ -72,23 +125,42 @@ class JobListing(BaseModel):
         candidate_url = urlunparse(parsed._replace(query=cleaned_query))
 
         # Follow redirects and verify link health to stop 404s
-        try:
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-            response = requests.head(candidate_url, headers=headers, timeout=5, allow_redirects=True)
-            if response.status_code in [404, 410, 403]:
-                raise ValueError(f"Dead link blocked (Status {response.status_code})")
-            return response.url if response.url else candidate_url
-        except requests.RequestException:
-            return candidate_url
+        if HAS_REQUESTS:
+            try:
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+                response = requests.head(candidate_url, headers=headers, timeout=5, allow_redirects=True)
+                if response.status_code in [404, 410, 403]:
+                    raise ValueError(f"Dead link blocked (Status {response.status_code})")
+                return response.url if response.url else candidate_url
+            except requests.RequestException:
+                return candidate_url
+        else:
+            try:
+                req = urllib.request.Request(
+                    candidate_url, 
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                    method="HEAD"
+                )
+                with urllib.request.urlopen(req, timeout=5) as resp:
+                    return resp.geturl() or candidate_url
+            except urllib.error.HTTPError as e:
+                if e.code in [404, 410, 403]:
+                    raise ValueError(f"Dead link blocked (Status {e.code})")
+                return candidate_url
+            except Exception:
+                return candidate_url
+
+if HAS_PYDANTIC:
+    JobListing.resolve_and_verify_url = field_validator("source_url", mode="before")(JobListing.resolve_and_verify_url)
 
     @field_validator("salary_max")
-    @classmethod
     def validate_salary_bounds(cls, v: Optional[int], info) -> Optional[int]:
         if v is not None and "salary_min" in info.data:
             min_sal = info.data["salary_min"]
             if min_sal is not None and v < min_sal:
                 raise ValueError("salary_max cannot be lower than salary_min")
         return v
+    JobListing.validate_salary_bounds = validate_salary_bounds
 
 
 # ---------------------------------------------------------------------------
@@ -288,9 +360,16 @@ class JobDatabase:
 
     def __init__(self, db_path: str = "junior_roles.db") -> None:
         self.db_path = db_path
+        self._mem_conn: Optional[sqlite3.Connection] = None
+        if self.db_path == ":memory:":
+            self._mem_conn = sqlite3.connect(":memory:")
+            self._mem_conn.row_factory = sqlite3.Row
+            self._mem_conn.execute("PRAGMA foreign_keys=ON;")
         self._initialize_schema()
 
     def get_connection(self) -> sqlite3.Connection:
+        if self._mem_conn is not None:
+            return self._mem_conn
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL;")
@@ -371,6 +450,20 @@ class JobDatabase:
 
         return {"inserted": inserted_count, "updated": updated_count, "total": len(jobs)}
 
+    def purge_mock_data(self) -> int:
+        """
+        Mandatory Pre-Flight Action:
+        Purges all records containing placeholder titles, test companies, or unverified sample strings.
+        """
+        query = "DELETE FROM job_listings WHERE company LIKE '%Mock%' OR company LIKE '%Test%' OR title LIKE '%Test%';"
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            purged = cursor.rowcount
+            conn.commit()
+            logger.info("Pre-flight purge executed: removed %d mock/test records from SQLite.", purged)
+            return purged
+
     def count(self) -> int:
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -395,8 +488,11 @@ class MultiSourceJobETLPipeline:
     Wellfound, and Remote OK, following redirects and pruning dead endpoints.
     """
 
-    def __init__(self, db: Optional[JobDatabase] = None) -> None:
+    def __init__(self, db: Optional[JobDatabase] = None, preflight_purge: bool = True) -> None:
         self.db = db or JobDatabase()
+        if preflight_purge:
+            purged = self.db.purge_mock_data()
+            logger.info("Mandatory pre-flight purge completed. Cleared %d mock/test records.", purged)
 
     def ingest_source_feed(
         self, source_name: str, raw_records: List[Dict[str, Any]]

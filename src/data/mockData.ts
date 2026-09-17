@@ -314,7 +314,7 @@ export const SIMULATOR_CHALLENGES: SimulatorChallenge[] = [
   },
   {
     id: 'sim-prompt-guard',
-    title: 'System Prompt & Guardrails Defense Test',
+    title: 'System Prompt & Guardrails Defense Assessment',
     category: 'Safety & System Alignment',
     badgeName: 'Guardrails & Safety Practitioner',
     badgeIcon: 'ShieldCheck',

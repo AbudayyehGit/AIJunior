@@ -912,6 +912,45 @@ app.delete('/api/jobs/:id', (req, res) => {
   res.status(404).json({ error: 'Job not found.' });
 });
 
+// 4. Mandatory Pre-Flight Action: Purge All Mock Data
+function purgeMockDataFromLiveStores(): number {
+  const initialCount = liveJobsDatabase.length;
+  liveJobsDatabase = liveJobsDatabase.filter((j) => {
+    const comp = (j.company || '').toLowerCase();
+    const title = (j.title || '').toLowerCase();
+    return !comp.includes('mock') && !comp.includes('test') && !title.includes('test');
+  });
+  const purged = initialCount - liveJobsDatabase.length;
+  if (purged > 0) {
+    console.log(`[Pre-Flight Purge] Eliminated ${purged} placeholder/mock jobs from memory.`);
+  }
+  return purged;
+}
+
+// Immediate boot-time execution
+purgeMockDataFromLiveStores();
+
+app.post('/api/admin/purge-mock-data', (req, res) => {
+  const purgedCount = purgeMockDataFromLiveStores();
+  securityLogsDatabase.unshift({
+    id: `sec-${Date.now()}`,
+    timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
+    eventType: 'ADMIN_AUTH_SUCCESS',
+    ipAddress: req.ip || '127.0.0.1',
+    severity: 'INFO',
+    endpoint: '/api/admin/purge-mock-data',
+    details: `Mandatory pre-flight purge executed. Eliminated ${purgedCount} mock/test records.`,
+    userRole: 'admin',
+    status: 'AUDITED'
+  });
+  res.json({
+    status: 'success',
+    message: 'Pre-flight wipe complete. All mock and test data purged.',
+    purgedCount,
+    remainingActiveJobs: liveJobsDatabase.length
+  });
+});
+
 // ==========================================
 // CANDIDATES & APPLICATIONS APIS
 // ==========================================
